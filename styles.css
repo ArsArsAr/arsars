@@ -703,33 +703,78 @@ h1 {
 }
 
 .capability-grid {
-  grid-template-columns: minmax(22rem, 0.9fr) minmax(0, 1fr) minmax(16rem, 0.75fr);
-  align-items: start;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(18rem, 0.42fr);
+  gap: clamp(1rem, 3vw, 2rem);
+  align-items: stretch;
+  margin-top: clamp(1.25rem, 2.5vw, 2rem);
+}
+
+.capability-grid > div:first-child {
+  grid-column: 1 / -1;
+  padding-bottom: clamp(0.75rem, 1.5vw, 1.25rem);
+  border-bottom: 1px solid color-mix(in srgb, var(--line) 82%, transparent);
+}
+
+.capability-grid .section-title {
+  max-width: 14ch;
+  font-size: clamp(2.2rem, 4.6vw, 4.5rem);
 }
 
 .skill-groups {
   display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1px;
-  background: var(--line);
+  background: color-mix(in srgb, var(--line) 82%, transparent);
+  height: 100%;
 }
 
 .skill-group,
 .education-panel {
-  padding: 1.25rem;
+  padding: clamp(1rem, 2vw, 1.35rem);
   background: var(--panel);
 }
 
 .education-panel {
-  align-self: start;
+  align-self: stretch;
+  min-height: 100%;
+  border-left: 1px solid color-mix(in srgb, var(--line) 82%, transparent);
+  background:
+    radial-gradient(circle at 80% 10%, color-mix(in srgb, var(--accent-2) 8%, transparent), transparent 12rem),
+    var(--panel);
 }
 
 .education-item {
-  padding-top: 1rem;
+  padding: 1rem 0 0;
+  border-top: 1px solid color-mix(in srgb, var(--line) 78%, transparent);
+}
+
+.education-item:first-of-type {
+  margin-top: 1rem;
 }
 
 .education-item p {
   margin: 0.5rem 0 0;
   color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
+.skill-group h3,
+.education-panel h3 {
+  font-size: clamp(0.95rem, 1.3vw, 1.15rem);
+  letter-spacing: 0.04em;
+}
+
+.skill-group ul {
+  gap: 0.38rem;
+  margin-top: 0.85rem;
+}
+
+.skill-group .tag {
+  min-height: 1.55rem;
+  padding: 0.18rem 0.48rem;
+  font-size: 0.66rem;
 }
 
 .contact-section {
@@ -941,6 +986,10 @@ h1 {
     grid-template-columns: 1fr;
   }
 
+  .skill-groups {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .profile-editorial {
     grid-template-columns: 1fr;
     gap: 1.5rem;
@@ -992,7 +1041,12 @@ h1 {
   }
 
   .capability-grid {
-    grid-template-columns: minmax(0, 1fr) minmax(15rem, 0.85fr);
+    grid-template-columns: 1fr;
+  }
+
+  .education-panel {
+    border-left: 0;
+    border-top: 1px solid color-mix(in srgb, var(--line) 82%, transparent);
   }
 
   .profile-editorial h2,
@@ -1012,7 +1066,8 @@ h1 {
   }
 
   .facts-strip dl,
-  .project-grid {
+  .project-grid,
+  .skill-groups {
     grid-template-columns: 1fr;
   }
 
