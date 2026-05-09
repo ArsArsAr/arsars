@@ -1,0 +1,5 @@
+<svg width="96" height="96" viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Resume mark">
+  <rect x="8" y="8" width="80" height="80" rx="18" fill="#0D7A6A"/>
+  <path d="M25 66V30H39.5C48.4 30 54.5 35.4 54.5 43.5C54.5 51.6 48.4 57 39.5 57H34.2V66H25ZM34.2 49.2H39.1C43.1 49.2 45.5 47.1 45.5 43.5C45.5 39.9 43.1 37.8 39.1 37.8H34.2V49.2Z" fill="#FFFDF8"/>
+  <path d="M57.2 66V30H66.4V58H81V66H57.2Z" fill="#F0BD59"/>
+</svg>

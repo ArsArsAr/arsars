@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Resume | Arsenij Arsiriy</title>
+    <meta name="description" content="Professional resume website for Arsenij Arsiriy.">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header class="site-header" aria-label="Primary navigation">
+      <a class="wordmark" href="#top" aria-label="Back to top">
+        <span data-initials>YN</span>
+      </a>
+      <nav class="nav" aria-label="Resume sections">
+        <a href="#profile">Profile</a>
+        <a href="#experience">Experience</a>
+        <a href="#work">Work</a>
+        <a href="#contact">Contact</a>
+      </nav>
+      <div class="header-actions">
+        <button class="icon-button" type="button" id="themeToggle" aria-label="Toggle theme" title="Toggle theme">
+          <span class="theme-glyph" aria-hidden="true"></span>
+        </button>
+      </div>
+    </header>
+
+    <main id="top">
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-media" aria-hidden="true">
+          <img src="assets/profile-portrait.svg" alt="">
+        </div>
+        <div class="hero-copy">
+          <p class="overline" data-field="location">Your City, Country</p>
+          <h1 id="hero-title" data-field="name">Arsenij Arsiriy</h1>
+          <p class="hero-role" data-field="role">Information Management Student</p>
+        </div>
+        <div class="hero-aside">
+          <p data-field="summary">
+            Practical, product-minded engineer who turns ambiguous ideas into reliable, maintainable software.
+          </p>
+          <div class="hero-links" id="primaryLinks"></div>
+        </div>
+        <div class="scroll-cue" aria-hidden="true">
+          <span>Scroll</span>
+          <span class="scroll-arrows">
+            <span></span>
+            <span></span>
+            <span></span>
+          </span>
+        </div>
+      </section>
+
+      <section class="facts-strip" aria-label="Professional snapshot">
+        <dl id="quickFacts"></dl>
+      </section>
+
+      <section class="profile-section" id="profile" aria-labelledby="profile-title">
+        <div class="section-label">
+          <span>01</span>
+          <p>Profile</p>
+        </div>
+        <div class="profile-statement">
+          <div class="profile-panel profile-panel-primary">
+            <h2 id="profile-title">Bridging business operations, systems thinking, and practical IT execution.</h2>
+          </div>
+          <div class="profile-panel profile-panel-secondary">
+            <p>
+              My background connects international operations, client communication, academic IT projects, and business process analysis. I am especially interested in project management, implementation work, and technology that makes organizations run better.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="capabilities" aria-labelledby="skills-title">
+        <div class="section-label">
+          <span>02</span>
+          <p>Capabilities</p>
+        </div>
+        <div class="capability-grid">
+          <div>
+            <h2 id="skills-title" class="section-title">Tools, systems, and habits</h2>
+          </div>
+          <div class="skill-groups" id="skillList"></div>
+          <div class="education-panel">
+            <h3>Education</h3>
+            <div id="educationList"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="split-section" id="experience" aria-labelledby="experience-title">
+        <div class="section-label sticky-label">
+          <span>03</span>
+          <p>Experience</p>
+        </div>
+        <div>
+          <h2 id="experience-title" class="section-title">Selected track record</h2>
+          <div class="experience-list" id="experienceList"></div>
+        </div>
+      </section>
+
+      <section class="work-section" id="work" aria-labelledby="work-title">
+        <div class="section-label">
+          <span>04</span>
+          <p>Work</p>
+        </div>
+        <div class="work-heading">
+          <h2 id="work-title" class="section-title">Academic systems, practical tools, and business analysis</h2>
+          <p>Projects spanning Android development, databases, UML modeling, market analysis, and a personal portfolio built as a living resume.</p>
+        </div>
+        <div class="project-grid" id="projectList"></div>
+      </section>
+
+      <section class="contact-section" id="contact" aria-labelledby="contact-title">
+        <div>
+          <p class="overline">Open to opportunities</p>
+          <h2 id="contact-title">Let's discuss business, systems, and IT projects.</h2>
+        </div>
+        <ul class="contact-list" id="contactList"></ul>
+      </section>
+    </main>
+
+    <script src="resume-data.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>
