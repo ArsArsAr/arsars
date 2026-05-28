@@ -6,8 +6,8 @@ window.resumeData = {
     "Information Management student at PJATK with experience in international client communication, operations coordination, and IT-related academic projects. Interested in project management, business systems, IT implementations, and technology-driven process optimization.",
   links: [
     { label: "Email", href: "mailto:arsenijarsiriy@gmail.com", primary: true },
-    { label: "LinkedIn", href: "#" },
-    { label: "GitHub", href: "#" }
+    { label: "LinkedIn", href: "https://www.linkedin.com/in/arsenijarsiriy/" },
+    { label: "GitHub", href: "https://github.com/ArsArsAr" }
   ],
   quickFacts: [
     { label: "Focus", value: "IT & business systems" },
@@ -108,8 +108,8 @@ window.resumeData = {
   contact: [
     { label: "arsenijarsiriy@gmail.com", href: "mailto:arsenijarsiriy@gmail.com" },
     { label: "+48 792 256 649", href: "tel:+48792256649" },
-    { label: "LinkedIn: to add", href: "#" },
-    { label: "GitHub: to add", href: "#" },
+    { label: "LinkedIn", href: "https://www.linkedin.com/in/arsenijarsiriy/" },
+    { label: "GitHub", href: "https://github.com/ArsArsAr" },
     { label: "Warsaw, Poland", href: "https://www.google.com/maps/place/Warsaw" }
   ]
 };
