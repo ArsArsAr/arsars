@@ -115,7 +115,11 @@
           <h2 id="work-title" class="section-title">Academic systems, practical tools, and business analysis</h2>
           <p>Projects spanning Android development, databases, UML modeling, market analysis, and a personal portfolio built as a living resume.</p>
         </div>
-        <div class="project-grid" id="projectList"></div>
+        <div class="work-carousel" aria-label="Project carousel">
+          <button class="carousel-button carousel-button--prev" type="button" id="projectPrev" aria-label="Previous project">Prev</button>
+          <div class="project-grid" id="projectList" tabindex="0" aria-label="Projects"></div>
+          <button class="carousel-button carousel-button--next" type="button" id="projectNext" aria-label="Next project">Next</button>
+        </div>
       </section>
 
       <section class="contact-section" id="contact" aria-labelledby="contact-title">

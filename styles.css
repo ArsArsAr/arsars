@@ -606,22 +606,56 @@ h1 {
   margin-top: 1rem;
 }
 
-.project-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1rem;
+.work-carousel {
+  position: relative;
   margin-top: 2rem;
+  padding: 1.25rem 0 3.25rem;
+}
+
+.project-grid {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: clamp(30rem, 48vw, 38rem);
+  perspective: 1400px;
+  perspective-origin: 50% 48%;
 }
 
 .project-card {
-  position: relative;
+  position: absolute;
+  inset: auto;
   display: grid;
   align-content: end;
-  min-height: clamp(22rem, 40vw, 34rem);
+  width: min(72vw, 46rem);
+  min-height: clamp(24rem, 42vw, 34rem);
   overflow: hidden;
   padding: clamp(1.2rem, 3vw, 2rem);
   background: var(--panel);
   color: var(--ink);
+  opacity: var(--carousel-opacity, 1);
+  cursor: default;
+  transform:
+    translate3d(var(--carousel-x, 0), 0, var(--carousel-z, 0))
+    rotateY(var(--carousel-rotate, 0))
+    scale(var(--carousel-scale, 1));
+  transition:
+    transform 760ms cubic-bezier(0.19, 1, 0.22, 1),
+    opacity 360ms ease,
+    filter 360ms ease;
+  will-change: transform, opacity;
+}
+
+.project-card[data-carousel-state="side"] {
+  cursor: pointer;
+  filter: saturate(0.82) brightness(0.82);
+}
+
+.project-card[data-carousel-state="far"] {
+  pointer-events: none;
+}
+.project-card[data-carousel-state="side"] .project-preview,
+.project-card[data-carousel-state="side"] .project-side-action {
+  pointer-events: none;
 }
 
 .project-card {
@@ -1085,6 +1119,41 @@ h1 {
   margin: 0;
   color: color-mix(in srgb, var(--inverse-ink) 72%, transparent);
   text-align: center;
+}
+
+.carousel-button {
+  position: absolute;
+  bottom: 0;
+  z-index: 15;
+  min-width: clamp(7rem, 11vw, 10rem);
+  min-height: clamp(3.25rem, 4.4vw, 4rem);
+  padding: 0 1.4rem;
+  border: 1px solid color-mix(in srgb, var(--ink) 24%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--page) 88%, transparent);
+  color: var(--ink);
+  font: inherit;
+  font-size: clamp(0.82rem, 1vw, 0.98rem);
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: transform 220ms ease, border-color 220ms ease, background 220ms ease;
+}
+
+.carousel-button:hover,
+.carousel-button:focus-visible {
+  border-color: var(--accent);
+  background: var(--panel);
+  transform: translateY(-1px);
+}
+
+.carousel-button--prev {
+  left: max(0rem, calc(50% - 13rem));
+}
+
+.carousel-button--next {
+  right: max(0rem, calc(50% - 13rem));
 }
 
 .project-card p {
@@ -1626,8 +1695,27 @@ h1 {
     width: min(100% - 1rem, 1180px);
   }
 
+  .work-carousel {
+    padding-bottom: 1rem;
+  }
+
+  .project-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    min-height: 0;
+    perspective: none;
+  }
+
+  .carousel-button,
   .project-card {
+    position: relative;
+    width: auto;
     min-height: 20rem;
+    opacity: 1;
+    pointer-events: auto;
+    transform: none;
+    filter: none;
   }
 
   .profile-copy ul {

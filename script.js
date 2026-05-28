@@ -249,7 +249,59 @@
     if (event.key === "ArrowRight") renderPdfPage(currentPdfPage + 1);
   });
   const projectList = document.querySelector("#projectList");
-  data.projects.forEach((project) => {
+  const projectPrev = document.querySelector("#projectPrev");
+  const projectNext = document.querySelector("#projectNext");
+  const projectCards = [];
+  const projectCarouselQuery = window.matchMedia("(min-width: 901px)");
+  let activeProjectIndex = 0;
+
+  const getProjectOffset = (index) => {
+    const total = projectCards.length;
+    let offset = index - activeProjectIndex;
+    if (offset > total / 2) offset -= total;
+    if (offset < -total / 2) offset += total;
+    return offset;
+  };
+
+  const updateProjectCarousel = () => {
+    if (!projectCarouselQuery.matches) {
+      projectCards.forEach((card) => {
+        card.dataset.carouselState = "stacked";
+        card.style.removeProperty("--carousel-x");
+        card.style.removeProperty("--carousel-z");
+        card.style.removeProperty("--carousel-rotate");
+        card.style.removeProperty("--carousel-scale");
+        card.style.removeProperty("--carousel-opacity");
+        card.style.removeProperty("z-index");
+        card.removeAttribute("inert");
+        card.setAttribute("aria-hidden", "false");
+      });
+      return;
+    }
+
+    projectCards.forEach((card, index) => {
+      const offset = getProjectOffset(index);
+      const absOffset = Math.abs(offset);
+      const clamped = Math.max(-2, Math.min(2, offset));
+
+      card.dataset.carouselState = absOffset === 0 ? "active" : absOffset === 1 ? "side" : "far";
+      card.style.setProperty("--carousel-x", `${clamped * 46}%`);
+      card.style.setProperty("--carousel-z", `${absOffset === 0 ? 0 : absOffset === 1 ? -7 : -15}rem`);
+      card.style.setProperty("--carousel-rotate", `${clamped * -10}deg`);
+      card.style.setProperty("--carousel-scale", `${absOffset === 0 ? 1 : absOffset === 1 ? 0.86 : 0.72}`);
+      card.style.setProperty("--carousel-opacity", `${absOffset === 0 ? 1 : absOffset === 1 ? 0.56 : 0}`);
+      card.style.zIndex = String(10 - absOffset);
+      card.toggleAttribute("inert", absOffset > 1);
+      card.setAttribute("aria-hidden", absOffset > 1 ? "true" : "false");
+    });
+  };
+
+  const setActiveProject = (index) => {
+    activeProjectIndex = (index + projectCards.length) % projectCards.length;
+    updateProjectCarousel();
+  };
+
+  data.projects.forEach((project, projectIndex) => {
     const article = makeElement("article", `project-card${project.document ? " project-card--document" : ""}${project.image ? " project-card--image" : ""}`);
     const content = makeElement("div", "project-content");
     content.appendChild(makeElement("h3", "", project.title));
@@ -313,8 +365,25 @@
       });
     }
 
+    article.addEventListener("click", (event) => {
+      const offset = getProjectOffset(projectIndex);
+      if (Math.abs(offset) === 1 && !event.target.closest("a, button")) {
+        setActiveProject(projectIndex);
+      }
+    });
+
+    projectCards.push(article);
     projectList.appendChild(article);
   });
+
+  projectPrev.addEventListener("click", () => setActiveProject(activeProjectIndex - 1));
+  projectNext.addEventListener("click", () => setActiveProject(activeProjectIndex + 1));
+  projectList.addEventListener("keydown", (event) => {
+    if (event.key === "ArrowLeft") setActiveProject(activeProjectIndex - 1);
+    if (event.key === "ArrowRight") setActiveProject(activeProjectIndex + 1);
+  });
+  projectCarouselQuery.addEventListener("change", updateProjectCarousel);
+  updateProjectCarousel();
 
   const skillList = document.querySelector("#skillList");
   data.skills.forEach((skill) => {
