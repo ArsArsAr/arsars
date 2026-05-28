@@ -59,7 +59,14 @@ window.resumeData = {
       title: "Product & Market Analysis Project",
       description:
         "University business project involving market analysis, product concept development, branding strategy, and marketing planning.",
-      tags: ["Market Analysis", "Branding", "Planning"]
+      tags: ["Market Analysis", "Branding", "Planning"],
+      document: {
+        label: "PDF",
+        href: "assets/ashtea-marketing-project.pdf",
+        preview: "assets/ashtea-marketing-preview.png",
+        pagePattern: "assets/ashtea-pages/page-{page}.png",
+        pageCount: 15
+      }
     }
   ],
   skills: [
@@ -82,6 +89,10 @@ window.resumeData = {
     {
       group: "Additional",
       items: ["Category B Driving License", "Aviation and general aviation aircraft interest"]
+    },
+    {
+      group: "Interests & Direction",
+      items: ["ERP Systems", "Project Management", "Business Systems", "Digital Transformation", "Automation & AI Tools"]
     }
   ],
   education: [
