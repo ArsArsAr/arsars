@@ -201,16 +201,23 @@
   };
 
   const closePdf = () => {
-    currentPdfProject = null;
-    pdfImage.removeAttribute("src");
-    if (typeof pdfModal.close === "function" && pdfModal.open) {
-      pdfModal.close();
-    } else {
-      pdfModal.removeAttribute("open");
-    }
+    if (!pdfModal.open) return;
+    pdfModal.classList.remove("is-open");
+    pdfModal.classList.add("is-closing");
+    window.setTimeout(() => {
+      currentPdfProject = null;
+      pdfImage.removeAttribute("src");
+      if (typeof pdfModal.close === "function" && pdfModal.open) {
+        pdfModal.close();
+      } else {
+        pdfModal.removeAttribute("open");
+      }
+      pdfModal.classList.remove("is-closing");
+    }, 200);
   };
 
   const openPdf = (project) => {
+    pdfModal.classList.remove("is-open", "is-closing");
     currentPdfProject = project;
     currentPdfPage = 1;
     pdfTitle.textContent = project.title;
@@ -221,6 +228,9 @@
     } else {
       pdfModal.setAttribute("open", "");
     }
+    requestAnimationFrame(() => {
+      pdfModal.classList.add("is-open");
+    });
   };
 
   pdfPrev.addEventListener("click", () => renderPdfPage(currentPdfPage - 1));
@@ -230,6 +240,7 @@
     if (event.target === pdfModal) closePdf();
   });
   pdfModal.addEventListener("close", () => {
+    pdfModal.classList.remove("is-open", "is-closing");
     currentPdfProject = null;
     pdfImage.removeAttribute("src");
   });
@@ -239,7 +250,7 @@
   });
   const projectList = document.querySelector("#projectList");
   data.projects.forEach((project) => {
-    const article = makeElement("article", `project-card${project.document ? " project-card--document" : ""}`);
+    const article = makeElement("article", `project-card${project.document ? " project-card--document" : ""}${project.image ? " project-card--image" : ""}`);
     const content = makeElement("div", "project-content");
     content.appendChild(makeElement("h3", "", project.title));
     content.appendChild(makeElement("p", "", project.description));
@@ -247,6 +258,21 @@
     project.tags.forEach((tag) => tags.appendChild(makeElement("span", "tag", tag)));
     content.appendChild(tags);
     article.appendChild(content);
+
+    if (project.action) {
+      const action = document.createElement("a");
+      const icon = makeElement("span", "project-side-action-icon", "GH");
+      const label = makeElement("span", "project-side-action-label", project.action.label);
+
+      action.className = "project-side-action";
+      action.href = project.action.href;
+      action.target = "_blank";
+      action.rel = "noreferrer";
+      action.setAttribute("aria-label", `Open ${project.action.label} repository`);
+      action.appendChild(icon);
+      action.appendChild(label);
+      article.appendChild(action);
+    }
 
     if (project.document) {
       const preview = makeElement("button", "project-preview");
@@ -263,6 +289,28 @@
       preview.appendChild(prompt);
       preview.addEventListener("click", () => openPdf(project));
       article.appendChild(preview);
+    } else if (project.image) {
+      const preview = makeElement("div", "project-preview project-preview--static");
+      const image = document.createElement("img");
+      const tag = makeElement("span", "project-preview-tag", project.image.label);
+
+      image.src = project.image.src;
+      image.alt = "";
+      preview.appendChild(image);
+      preview.appendChild(tag);
+      article.appendChild(preview);
+
+      article.addEventListener("pointermove", (event) => {
+        const rect = article.getBoundingClientRect();
+        const x = ((event.clientX - rect.left) / rect.width - 0.5) * 2;
+        const y = ((event.clientY - rect.top) / rect.height - 0.5) * 2;
+        article.style.setProperty("--preview-pan-x", `${x * -18}%`);
+        article.style.setProperty("--preview-pan-y", `${y * -10}%`);
+      });
+      article.addEventListener("pointerleave", () => {
+        article.style.setProperty("--preview-pan-x", "0%");
+        article.style.setProperty("--preview-pan-y", "0%");
+      });
     }
 
     projectList.appendChild(article);

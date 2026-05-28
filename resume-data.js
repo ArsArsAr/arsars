@@ -35,7 +35,28 @@ window.resumeData = {
       title: "University Life Management Android Application",
       description:
         "Personal academic Android project focused on improving university organization and productivity with schedules, notes, exams, deadline tracking, student support tools, and OCR-based schedule import.",
-      tags: ["Kotlin", "Jetpack Compose", "Room", "MVVM", "Material 3", "ML Kit OCR", "Gradle", "Android Studio"]
+      tags: ["Kotlin", "Jetpack Compose", "Room", "MVVM", "Material 3", "ML Kit OCR", "Gradle", "Android Studio"],
+      image: {
+        src: "assets/unilife-preview.png",
+        label: "Android App"
+      },
+      action: {
+        label: "GitHub",
+        href: "https://github.com/ArsArsAr/UniLife_App"
+      }
+    },
+    {
+      title: "Product & Market Analysis Project",
+      description:
+        "University business project involving market analysis, product concept development, branding strategy, and marketing planning.",
+      tags: ["Market Analysis", "Branding", "Planning"],
+      document: {
+        label: "PDF",
+        href: "assets/ashtea-marketing-project.pdf",
+        preview: "assets/ashtea-marketing-preview.png",
+        pagePattern: "assets/ashtea-pages/page-{page}.png",
+        pageCount: 15
+      }
     },
     {
       title: "Personal CV / Portfolio Website",
@@ -54,19 +75,6 @@ window.resumeData = {
       description:
         "Designed UML system plans for a cat cafe management system and a computer club management system.",
       tags: ["UML", "Systems Design", "Modeling"]
-    },
-    {
-      title: "Product & Market Analysis Project",
-      description:
-        "University business project involving market analysis, product concept development, branding strategy, and marketing planning.",
-      tags: ["Market Analysis", "Branding", "Planning"],
-      document: {
-        label: "PDF",
-        href: "assets/ashtea-marketing-project.pdf",
-        preview: "assets/ashtea-marketing-preview.png",
-        pagePattern: "assets/ashtea-pages/page-{page}.png",
-        pageCount: 15
-      }
     }
   ],
   skills: [
