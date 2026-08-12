@@ -3,137 +3,505 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Resume | Arsenij Arsiriy</title>
-    <meta name="description" content="Resume and project portfolio of Arsenij Arsiriy">
-    <meta property="og:description" content="Resume and project portfolio of Arsenij Arsiriy">
-    <meta name="twitter:description" content="Resume and project portfolio of Arsenij Arsiriy">
+    <title>Arsenij Arsiriy — Information Management Student | Resume &amp; Projects</title>
+    <meta name="description" content="Resume and project portfolio of Arsenij Arsiriy — Information Management student at PJATK, Warsaw. Business systems, IT projects, operations coordination.">
+    <meta name="author" content="Arsenij Arsiriy">
+    <meta name="theme-color" content="#0b0a09">
+
+    <meta property="og:type" content="profile">
+    <meta property="og:title" content="Arsenij Arsiriy — Information Management Student">
+    <meta property="og:description" content="Resume and project portfolio. Business systems, IT projects, operations coordination. Warsaw, Poland.">
+    <meta property="og:image" content="assets/og-cover.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Arsenij Arsiriy — Information Management Student">
+    <meta name="twitter:description" content="Resume and project portfolio. Business systems, IT projects, operations coordination.">
+    <meta name="twitter:image" content="assets/og-cover.jpg">
+
+    <link rel="icon" href="assets/favicon.png" type="image/png">
+    <link rel="apple-touch-icon" href="assets/favicon.png">
+    <link rel="preload" as="image" href="assets/arsenij-photo-640.webp">
     <link rel="stylesheet" href="styles.css">
+
+    <script>document.documentElement.classList.add("js");</script>
   </head>
+
   <body>
-    <header class="site-header" aria-label="Primary navigation">
-      <a class="wordmark" href="#top" aria-label="Back to top">
-        <span data-initials>YN</span>
-      </a>
-      <nav class="nav" aria-label="Resume sections">
-        <a href="#profile">Profile</a>
-        <a href="#experience">Experience</a>
-        <a href="#work">Work</a>
-        <a href="#contact">Contact</a>
+    <a class="skip-link" href="#content">Skip to resume content</a>
+
+    <header class="site-header" id="top">
+      <nav class="nav" id="sectionNav" aria-label="Resume sections">
+        <a class="nav-link" href="#profile">Profile</a>
+        <a class="nav-link" href="#capabilities">Capabilities</a>
+        <a class="nav-link" href="#experience">Experience</a>
+        <a class="nav-link" href="#work">Work</a>
+        <a class="nav-link" href="#contact">Contact</a>
       </nav>
       <div class="header-actions">
-        <button class="text-button" type="button" id="downloadCvButton">Download CV</button>
-        <button class="icon-button" type="button" id="themeToggle" aria-label="Toggle theme" title="Toggle theme">
-          <span class="theme-glyph" aria-hidden="true"></span>
+        <button class="btn btn--accent btn--sm" type="button" data-cv-open>
+          <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11m0 0 4-4m-4 4-4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+          <span>Download CV</span>
         </button>
       </div>
     </header>
 
-    <main id="top">
-      <section class="hero" aria-labelledby="hero-title">
-        <div class="hero-media" aria-hidden="true">
-          <img src="assets/arsenij-photo.png" alt="">
-        </div>
-        <div class="hero-copy">
-          <p class="overline" data-field="location">Your City, Country</p>
-          <h1 id="hero-title" data-field="name">Arsenij Arsiriy</h1>
-          <p class="hero-role" data-field="role">Information Management Student</p>
-        </div>
-        <div class="hero-aside">
-          <p data-field="summary">
-            Practical, product-minded engineer who turns ambiguous ideas into reliable, maintainable software.
+    <main class="desktop-shell">
+      <div class="task-view">
+        <div class="hero">
+          <p class="overline">Warsaw, Poland</p>
+          <h1 class="hero-name">Arsenij Arsiriy</h1>
+          <p class="hero-role">Information Management Student</p>
+          <p class="hero-summary">
+            Information Management student at PJATK with experience in international client
+            communication, operations coordination, and IT-related academic projects. Interested in
+            project management, business systems, IT implementations, and technology-driven process
+            optimization.
           </p>
-          <div class="hero-links" id="primaryLinks"></div>
-        </div>
-        <div class="scroll-cue" aria-hidden="true">
-          <span>Scroll</span>
-          <span class="scroll-arrows">
-            <span></span>
-            <span></span>
-            <span></span>
-          </span>
-        </div>
-      </section>
-
-      <section class="facts-strip" aria-label="Professional snapshot">
-        <dl id="quickFacts"></dl>
-      </section>
-
-      <section class="profile-section" id="profile" aria-labelledby="profile-title">
-        <div class="section-label">
-          <span>01</span>
-          <p>Profile</p>
-        </div>
-        <div class="profile-editorial">
-          <p class="profile-index">Information Management / Operations / IT Projects</p>
-          <h2 id="profile-title">Information Management student focused on business systems and IT implementation.</h2>
-          <div class="profile-copy">
-            <p>
-              Experience in international client communication, operations coordination, and technical university projects. Currently developing practical skills in project management, business systems, and process optimization.
-            </p>
-            <ul aria-label="Profile focus areas">
-              <li>Project management</li>
-              <li>Business systems</li>
-              <li>IT implementations</li>
-              <li>Process optimization</li>
-            </ul>
+          <div class="hero-actions">
+            <button class="btn btn--accent" type="button" data-cv-open>
+              <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11m0 0 4-4m-4 4-4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+              <span>Download CV</span>
+            </button>
+            <a class="btn" href="#profile" data-window-link="profile">View profile</a>
+            <a class="btn btn--quiet" href="https://www.linkedin.com/in/arsenijarsiriy/" target="_blank" rel="noreferrer">LinkedIn</a>
+            <a class="btn btn--quiet" href="https://github.com/ArsArsAr" target="_blank" rel="noreferrer">GitHub</a>
           </div>
         </div>
-      </section>
 
-      <section class="capabilities" aria-labelledby="skills-title">
-        <div class="section-label">
-          <span>02</span>
-          <p>Capabilities</p>
-        </div>
-        <div class="capability-grid">
-          <div>
-            <h2 id="skills-title" class="section-title">Tools, systems, and habits</h2>
-          </div>
-          <div class="skill-groups" id="skillList"></div>
-          <div class="education-panel">
-            <h3>Education</h3>
-            <div id="educationList"></div>
-          </div>
-        </div>
-      </section>
+        <!-- Tiles are real links: without JS they jump to the section below. -->
+        <nav class="task-grid" id="windowGrid" aria-label="Resume sections">
+          <a class="task-window task-window--feature" href="#profile" data-window="profile">
+            <img class="tile-photo" src="assets/arsenij-photo-640.webp" width="640" height="640" alt="" decoding="async">
+            <span class="tile-body">
+              <span class="tile-number">01</span>
+              <span class="tile-title">Profile</span>
+              <span class="tile-kicker">Who I am, quick facts, and the CV</span>
+              <span class="tile-cta">Open</span>
+            </span>
+          </a>
 
-      <section class="split-section" id="experience" aria-labelledby="experience-title">
-        <div class="section-label sticky-label">
-          <span>03</span>
-          <p>Experience</p>
-        </div>
-        <div>
-          <h2 id="experience-title" class="section-title">Selected track record</h2>
-          <div class="experience-list" id="experienceList"></div>
-        </div>
-      </section>
+          <a class="task-window task-window--feature" href="#work" data-window="work">
+            <img class="tile-photo tile-photo--contain" src="assets/unilife-preview.webp" width="1200" height="800" alt="" loading="lazy" decoding="async">
+            <span class="tile-body">
+              <span class="tile-number">04</span>
+              <span class="tile-title">Work</span>
+              <span class="tile-kicker">5 projects — Android app, databases, analysis</span>
+              <span class="tile-cta">Open</span>
+            </span>
+          </a>
 
-      <section class="work-section" id="work" aria-labelledby="work-title">
-        <div class="section-label">
-          <span>04</span>
-          <p>Work</p>
-        </div>
-        <div class="work-heading">
-          <h2 id="work-title" class="section-title">Academic systems, practical tools, and business analysis</h2>
-          <p>Projects spanning Android development, databases, UML modeling, market analysis, and a personal portfolio built as a living resume.</p>
-        </div>
-        <div class="work-carousel" aria-label="Project carousel">
-          <button class="carousel-button carousel-button--prev" type="button" id="projectPrev" aria-label="Previous project">Prev</button>
-          <div class="project-grid" id="projectList" tabindex="0" aria-label="Projects"></div>
-          <button class="carousel-button carousel-button--next" type="button" id="projectNext" aria-label="Next project">Next</button>
-        </div>
-      </section>
+          <a class="task-window task-window--wide" href="#capabilities" data-window="capabilities">
+            <span class="tile-body">
+              <span class="tile-number">02</span>
+              <span class="tile-title">Capabilities</span>
+              <span class="tile-kicker">Tools, technical basics, education</span>
+              <span class="tile-chips">
+                <span class="chip">ERP Systems</span>
+                <span class="chip">SQL</span>
+                <span class="chip">Project Management</span>
+                <span class="chip">Jira</span>
+              </span>
+              <span class="tile-cta">Open</span>
+            </span>
+          </a>
 
-      <section class="contact-section" id="contact" aria-labelledby="contact-title">
-        <div>
-          <p class="overline">Open to opportunities</p>
-          <h2 id="contact-title">Let's discuss business, systems, and IT projects.</h2>
-        </div>
-        <ul class="contact-list" id="contactList"></ul>
-      </section>
+          <a class="task-window" href="#experience" data-window="experience">
+            <span class="tile-body">
+              <span class="tile-number">03</span>
+              <span class="tile-title">Experience</span>
+              <span class="tile-kicker">Freight Broker at Landstar</span>
+              <span class="tile-cta">Open</span>
+            </span>
+          </a>
+
+          <a class="task-window" href="#contact" data-window="contact">
+            <span class="tile-body">
+              <span class="tile-number">05</span>
+              <span class="tile-title">Contact</span>
+              <span class="tile-kicker">Email, phone, links</span>
+              <span class="tile-cta">Open</span>
+            </span>
+          </a>
+        </nav>
+      </div>
     </main>
 
-    <script src="resume-data.js"></script>
-    <script src="script.js"></script>
+    <!--
+      ============================================================================
+      RESUME CONTENT — THIS IS THE SOURCE OF TRUTH. Edit here to update the site.
+      (resume-data.js is no longer read by the page; see README note.)
+      With JS on, app.js lifts each <section> into the window overlay on demand.
+      With JS off, this renders as a plain, readable resume document.
+      ============================================================================
+    -->
+    <div class="doc-source" id="content">
+
+      <section class="doc-section" id="profile" data-title="Profile" data-number="01" data-kicker="Information Management / Operations / IT Projects">
+        <header class="doc-head">
+          <p class="doc-index"><b>01</b> Profile</p>
+          <p class="doc-kicker">Information Management / Operations / IT Projects</p>
+        </header>
+
+        <div class="profile-layout">
+          <div class="profile-main">
+            <h2 class="doc-lead">Bridging operations, business systems, and IT projects.</h2>
+            <p class="body-text">
+              Information Management student with experience in international client communication,
+              operations coordination, and IT-related university projects. Currently focused on
+              project management, business systems, IT implementations, and practical process
+              optimization.
+            </p>
+            <ul class="tag-list">
+              <li class="tag">Client communication</li>
+              <li class="tag">Operations coordination</li>
+              <li class="tag">Business systems</li>
+              <li class="tag">IT implementation</li>
+              <li class="tag">Process optimization</li>
+            </ul>
+            <div class="profile-cta">
+              <button class="btn btn--accent" type="button" data-cv-open>
+                <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11m0 0 4-4m-4 4-4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+                <span>Download CV</span>
+              </button>
+              <a class="btn" href="mailto:arsenijarsiriy@gmail.com">Email me</a>
+            </div>
+          </div>
+
+          <figure class="profile-portrait">
+            <img src="assets/arsenij-photo-1000.webp" width="1000" height="1000"
+                 alt="Portrait of Arsenij Arsiriy" loading="lazy" decoding="async">
+          </figure>
+
+          <dl class="fact-row">
+            <div class="fact"><dt>Focus</dt><dd>IT &amp; business systems</dd></div>
+            <div class="fact"><dt>Education</dt><dd>PJATK, 2024–2027</dd></div>
+            <div class="fact"><dt>Experience</dt><dd>Operations &amp; freight</dd></div>
+            <div class="fact"><dt>Languages</dt><dd>UA · RU · PL · EN</dd></div>
+          </dl>
+        </div>
+      </section>
+
+      <section class="doc-section" id="capabilities" data-title="Capabilities" data-number="02" data-kicker="Tools / Direction / Education">
+        <header class="doc-head">
+          <p class="doc-index"><b>02</b> Capabilities</p>
+          <p class="doc-kicker">Tools / Direction / Education</p>
+        </header>
+
+        <h2 class="doc-lead">ERP systems, digital transformation, automation, and practical project delivery.</h2>
+
+        <div class="panel-grid">
+          <article class="panel panel--feature">
+            <h3 class="panel-label">Interests &amp; Direction</h3>
+            <ul class="tag-list">
+              <li class="tag">ERP Systems</li>
+              <li class="tag">Project Management</li>
+              <li class="tag">Business Systems</li>
+              <li class="tag">Digital Transformation</li>
+              <li class="tag">Automation &amp; AI Tools</li>
+            </ul>
+          </article>
+
+          <article class="panel">
+            <h3 class="panel-label">Tools</h3>
+            <ul class="tag-list">
+              <li class="tag">Jira</li><li class="tag">Git</li><li class="tag">Android Studio</li>
+              <li class="tag">Microsoft Excel</li><li class="tag">Microsoft Access</li>
+              <li class="tag">DataGrip</li><li class="tag">Cisco Packet Tracer</li>
+              <li class="tag">Adobe Photoshop</li>
+            </ul>
+          </article>
+
+          <article class="panel">
+            <h3 class="panel-label">Technical Basics</h3>
+            <ul class="tag-list">
+              <li class="tag">SQL</li><li class="tag">Python</li><li class="tag">Java</li>
+              <li class="tag">HTML</li><li class="tag">CSS</li><li class="tag">JavaScript</li>
+            </ul>
+          </article>
+
+          <article class="panel">
+            <h3 class="panel-label">Business &amp; Operations</h3>
+            <ul class="tag-list">
+              <li class="tag">Client communication</li><li class="tag">Negotiation</li>
+              <li class="tag">Documentation</li><li class="tag">Process coordination</li>
+              <li class="tag">Cold-calling</li><li class="tag">Problem-solving</li>
+            </ul>
+          </article>
+
+          <article class="panel">
+            <h3 class="panel-label">Languages</h3>
+            <ul class="lang-list">
+              <li><span>Ukrainian</span><b>Native</b></li>
+              <li><span>Russian</span><b>Native</b></li>
+              <li><span>Polish</span><b>Native</b></li>
+              <li><span>English</span><b>C1 · IELTS 8.0</b></li>
+            </ul>
+          </article>
+
+          <article class="panel">
+            <h3 class="panel-label">Additional</h3>
+            <ul class="tag-list">
+              <li class="tag">Category B Driving License</li>
+              <li class="tag">Aviation interest</li>
+            </ul>
+          </article>
+        </div>
+
+        <h3 class="sub-label">Education</h3>
+        <ol class="timeline">
+          <li class="timeline-item">
+            <p class="timeline-date">2024 — Present</p>
+            <div>
+              <h4>Polish-Japanese Academy of Information Technology (PJATK)</h4>
+              <p class="meta">BEng in Information Management · Expected 2027</p>
+              <p class="body-text">
+                Coursework includes Databases, Information Systems Design, ERP Systems, Business
+                Process Modeling, Statistical Data Analysis, IT Project Management, Computer Networks
+                &amp; Cybersecurity, Object-Oriented Programming, Web Development, and Intelligent
+                Management Systems.
+              </p>
+            </div>
+          </li>
+          <li class="timeline-item">
+            <p class="timeline-date">2023 — 2024</p>
+            <div>
+              <h4>University of Warsaw</h4>
+              <p class="meta">Internal Security</p>
+              <p class="body-text">Academic program in internal security.</p>
+            </div>
+          </li>
+          <li class="timeline-item">
+            <p class="timeline-date">2019 — 2023</p>
+            <div>
+              <h4>Janusz Korczak High School No. 2 in Warsaw</h4>
+              <p class="meta">Secondary Education</p>
+              <p class="body-text">Completed high school education in Warsaw.</p>
+            </div>
+          </li>
+        </ol>
+      </section>
+
+      <section class="doc-section" id="experience" data-title="Experience" data-number="03" data-kicker="Operations / Communication / Coordination">
+        <header class="doc-head">
+          <p class="doc-index"><b>03</b> Experience</p>
+          <p class="doc-kicker">Operations / Communication / Coordination</p>
+        </header>
+
+        <h2 class="doc-lead">International operations, negotiation, and client communication.</h2>
+
+        <article class="job">
+          <div class="job-head">
+            <div>
+              <h3>Freight Broker</h3>
+              <p class="meta">Landstar</p>
+            </div>
+            <p class="job-date">Jul 2025 — Dec 2025 · Hybrid</p>
+          </div>
+          <ul class="bullets">
+            <li>Coordinated freight transportation operations across the United States, Canada, and Mexico.</li>
+            <li>Negotiated pricing and transport conditions with clients and carriers while managing multiple shipments simultaneously.</li>
+            <li>Built and maintained communication with clients and truck drivers throughout the delivery process.</li>
+            <li>Prepared contracts and operational documentation in an English-speaking international environment.</li>
+            <li>Conducted outbound communication and client acquisition through cold-calling.</li>
+            <li>Received positive feedback for fast onboarding, communication skills, and ability to close deals early into the role.</li>
+          </ul>
+        </article>
+      </section>
+
+      <section class="doc-section" id="work" data-title="Work" data-number="04" data-kicker="Projects / Systems / Analysis">
+        <header class="doc-head">
+          <p class="doc-index"><b>04</b> Work</p>
+          <p class="doc-kicker">Projects / Systems / Analysis</p>
+        </header>
+
+        <h2 class="doc-lead">Academic systems, practical tools, and business analysis.</h2>
+
+        <div class="rail-wrap">
+          <ul class="rail" id="projectRail" tabindex="0" role="list" aria-label="Projects — scroll horizontally">
+
+            <li class="pcard">
+              <div class="pcard-media">
+                <img src="assets/unilife-preview.webp" width="1200" height="800" alt="UniLife Android app screens" loading="lazy" decoding="async">
+                <span class="pcard-badge">Android App</span>
+              </div>
+              <div class="pcard-body">
+                <h3>University Life Management Android Application</h3>
+                <p>Personal academic Android project focused on improving university organization and productivity with schedules, notes, exams, deadline tracking, student support tools, and OCR-based schedule import.</p>
+                <ul class="tag-list tag-list--sm">
+                  <li class="tag">Kotlin</li><li class="tag">Jetpack Compose</li><li class="tag">Room</li>
+                  <li class="tag">MVVM</li><li class="tag">Material 3</li><li class="tag">ML Kit OCR</li>
+                  <li class="tag">Gradle</li>
+                </ul>
+                <a class="btn btn--sm" href="https://github.com/ArsArsAr/UniLife_App" target="_blank" rel="noreferrer">
+                  View on GitHub<span class="sr-only"> — University Life Management Android Application</span>
+                </a>
+              </div>
+            </li>
+
+            <li class="pcard">
+              <div class="pcard-media">
+                <img src="assets/ashtea-marketing-preview.webp" width="1000" height="562" alt="Product and market analysis document cover" loading="lazy" decoding="async">
+                <span class="pcard-badge">PDF · 15 pages</span>
+              </div>
+              <div class="pcard-body">
+                <h3>Product &amp; Market Analysis Project</h3>
+                <p>University business project involving market analysis, product concept development, branding strategy, and marketing planning.</p>
+                <ul class="tag-list tag-list--sm">
+                  <li class="tag">Market Analysis</li><li class="tag">Branding</li><li class="tag">Planning</li>
+                </ul>
+                <button class="btn btn--sm" type="button" data-pdf="ashtea">
+                  Read the document<span class="sr-only"> — Product and Market Analysis Project</span>
+                </button>
+              </div>
+            </li>
+
+            <li class="pcard">
+              <div class="pcard-media pcard-media--glyph" data-glyph="DB" aria-hidden="true"></div>
+              <div class="pcard-body">
+                <h3>Vehicle Workshop Database System</h3>
+                <p>University ERD and database project supported with Microsoft Access, covering customer management, orders, parts tracking, and relational structure design.</p>
+                <ul class="tag-list tag-list--sm">
+                  <li class="tag">Microsoft Access</li><li class="tag">ERD</li><li class="tag">Databases</li>
+                </ul>
+              </div>
+            </li>
+
+            <li class="pcard">
+              <div class="pcard-media pcard-media--glyph" data-glyph="UML" aria-hidden="true"></div>
+              <div class="pcard-body">
+                <h3>UML System Design Projects</h3>
+                <p>Designed UML system plans for a cat cafe management system and a computer club management system.</p>
+                <ul class="tag-list tag-list--sm">
+                  <li class="tag">UML</li><li class="tag">Systems Design</li><li class="tag">Modeling</li>
+                </ul>
+              </div>
+            </li>
+
+            <li class="pcard">
+              <div class="pcard-media pcard-media--glyph" data-glyph="WEB" aria-hidden="true"></div>
+              <div class="pcard-body">
+                <h3>Personal CV / Portfolio Website</h3>
+                <p>This site. Static, dependency-free portfolio built as a desktop-style shell, with the resume content server-rendered for search engines and a no-JavaScript fallback.</p>
+                <ul class="tag-list tag-list--sm">
+                  <li class="tag">HTML</li><li class="tag">CSS</li><li class="tag">JavaScript</li>
+                </ul>
+                <a class="btn btn--sm" href="https://github.com/ArsArsAr" target="_blank" rel="noreferrer">
+                  GitHub<span class="sr-only"> — Personal CV / Portfolio Website</span>
+                </a>
+              </div>
+            </li>
+          </ul>
+
+          <div class="rail-nav">
+            <button class="rail-arrow" type="button" data-rail="prev" aria-label="Previous project">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5 8 12l7 7"/></svg>
+            </button>
+            <div class="rail-dots" id="railDots" role="tablist" aria-label="Choose project"></div>
+            <button class="rail-arrow" type="button" data-rail="next" aria-label="Next project">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section class="doc-section" id="contact" data-title="Contact" data-number="05" data-kicker="CV / Links / Availability">
+        <header class="doc-head">
+          <p class="doc-index"><b>05</b> Contact</p>
+          <p class="doc-kicker">CV / Links / Availability</p>
+        </header>
+
+        <div class="contact-layout">
+          <div>
+            <h2 class="doc-lead">Let's discuss business, systems, and IT projects.</h2>
+            <p class="body-text">
+              Open to conversations around business systems, project coordination, IT
+              implementations, and practical technology-driven process improvement.
+            </p>
+            <button class="btn btn--accent btn--block" type="button" data-cv-open>
+              <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11m0 0 4-4m-4 4-4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+              <span>Download CV</span>
+            </button>
+          </div>
+
+          <ul class="contact-list">
+            <li>
+              <a href="mailto:arsenijarsiriy@gmail.com">
+                <span class="contact-label">Email</span>
+                <span class="contact-value">arsenijarsiriy@gmail.com</span>
+              </a>
+            </li>
+            <li>
+              <a href="tel:+48792256649">
+                <span class="contact-label">Phone</span>
+                <span class="contact-value">+48 792 256 649</span>
+              </a>
+            </li>
+            <li>
+              <a href="https://www.linkedin.com/in/arsenijarsiriy/" target="_blank" rel="noreferrer">
+                <span class="contact-label">LinkedIn</span>
+                <span class="contact-value">in/arsenijarsiriy</span>
+              </a>
+            </li>
+            <li>
+              <a href="https://github.com/ArsArsAr" target="_blank" rel="noreferrer">
+                <span class="contact-label">GitHub</span>
+                <span class="contact-value">ArsArsAr</span>
+              </a>
+            </li>
+            <li>
+              <a href="https://www.google.com/maps/place/Warsaw" target="_blank" rel="noreferrer">
+                <span class="contact-label">Location</span>
+                <span class="contact-value">Warsaw, Poland</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </section>
+    </div>
+
+    <!-- Window overlay (JS only) -->
+    <div class="stage" id="sectionStage" hidden>
+      <div class="stage-backdrop" data-close-window></div>
+      <div class="stage-window" role="dialog" aria-modal="true" aria-labelledby="windowTitle">
+        <div class="window-toolbar">
+          <div class="traffic" role="group" aria-label="Window controls">
+            <button class="traffic-btn traffic-btn--close" type="button" data-glyph="✕"
+                    data-window-action="close" title="Close" aria-label="Close window"></button>
+            <button class="traffic-btn traffic-btn--min" type="button" data-glyph="−"
+                    data-window-action="minimize" title="Minimize" aria-label="Minimize to overview"></button>
+            <button class="traffic-btn traffic-btn--zoom" type="button" data-glyph="⤡"
+                    data-window-action="zoom" title="Exit full screen" aria-label="Exit full screen"></button>
+          </div>
+          <p class="window-title" id="windowTitle">Window</p>
+          <button class="btn btn--sm window-close" type="button" data-close-window>
+            <span>Overview</span>
+            <kbd>Esc</kbd>
+          </button>
+        </div>
+        <div class="window-body" id="windowContent" tabindex="-1"></div>
+      </div>
+    </div>
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": "Arsenij Arsiriy",
+      "jobTitle": "Information Management Student",
+      "email": "mailto:arsenijarsiriy@gmail.com",
+      "telephone": "+48792256649",
+      "address": { "@type": "PostalAddress", "addressLocality": "Warsaw", "addressCountry": "PL" },
+      "alumniOf": [
+        { "@type": "CollegeOrUniversity", "name": "Polish-Japanese Academy of Information Technology" },
+        { "@type": "CollegeOrUniversity", "name": "University of Warsaw" }
+      ],
+      "knowsLanguage": ["uk", "ru", "pl", "en"],
+      "knowsAbout": ["ERP Systems", "Project Management", "Business Systems", "SQL", "Databases", "Digital Transformation"],
+      "sameAs": ["https://www.linkedin.com/in/arsenijarsiriy/", "https://github.com/ArsArsAr"]
+    }
+    </script>
+
+    <script src="app.js" defer></script>
   </body>
 </html>
