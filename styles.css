@@ -20,6 +20,18 @@
 
    Switzer (same foundry, same licence) replaced Archivo for the same reason
    on the body side. Note it has no width axis — see the body rule. */
+/* Kept for the masthead alone — see .hero-name. Both cuts are declared
+   because the second line of the name is italic. */
+@font-face {
+  font-family: "EB Garamond Variable";
+  src: url("assets/fonts/garamond-var.woff2") format("woff2-variations");
+  font-weight: 400 800; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: "EB Garamond Variable";
+  src: url("assets/fonts/garamond-var-italic.woff2") format("woff2-variations");
+  font-weight: 400 800; font-style: italic; font-display: swap;
+}
 @font-face {
   font-family: "Zodiak Variable";
   src: url("assets/fonts/zodiak-var.woff2") format("woff2-variations");
@@ -67,6 +79,8 @@
 
   /* Type: display roman / grotesque UI / mono data */
   --font-display: "Zodiak Variable", ui-serif, Georgia, serif;
+  /* The masthead only. Every other display line runs --font-display. */
+  --font-name:    "EB Garamond Variable", ui-serif, Georgia, serif;
   --font-body:    "Switzer Variable", ui-sans-serif, system-ui, "Segoe UI", sans-serif;
   --font-mono:    "DM Mono", ui-monospace, "SF Mono", Consolas, monospace;
 
@@ -339,17 +353,17 @@ button, a { -webkit-tap-highlight-color: transparent; }
    no card scaffolding. */
 .hero-name {
   margin: 0;
-  font-family: var(--font-display);
-  /* Sized down ~7% from the Garamond setting to hold the same cap height:
-     Zodiak's caps are 0.70em against Garamond's 0.65, and its x-height is
-     0.52 against 0.40, so a straight swap at the old size would have set the
-     masthead visibly larger and much heavier. */
-  font-size: clamp(2.8rem, 11.6vw, 10.7rem);
+  /* The one place Garamond stays. Zodiak carries every other display line,
+     but the masthead is the signature and Garamond set it better — so this
+     element keeps its own face, at its original size. Anything sized against
+     Zodiak's larger cap and x-height would be wrong here. */
+  font-family: var(--font-name);
+  font-size: clamp(3rem, 12.5vw, 11.5rem);
   font-weight: 500;
   letter-spacing: -0.025em;
   line-height: 0.88;
-  /* The italic descenders overflow a line box this tight — the boxes don't
-     collide but the ink does, so reserve depth for the tail of the "y". */
+  /* Garamond's italic descenders overflow a line box this tight — the boxes
+     don't collide but the ink does, so reserve depth for the tail of the "y". */
   padding-bottom: 0.14em;
   text-wrap: balance;
 }
