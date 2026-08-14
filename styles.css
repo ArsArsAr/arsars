@@ -545,6 +545,22 @@ html:not(.js) .lang-switch { display: none; }
     rgba(10, 10, 10, 0.24) 60%, transparent 80%);
 }
 
+/* A feature tile is covered edge to edge by its photo and, along the bottom, by
+   a scrim that matches the page exactly — which is what makes it read as having
+   no bottom edge at all. So its own background is never seen, with one
+   exception: the tile's box ends on a half pixel, and that last row is a 50/50
+   blend of the scrim with whatever lies behind it. At --surface that is four
+   steps lighter than the page, and hover animates it lighter still, so the
+   blend surfaces as a bright line — flickering, because translating the tile
+   changes the coverage of that row on every frame of the transition.
+
+   Pinning the background to the page leaves that row nothing to reveal. The
+   colour is never visible in its own right here, so nothing is lost: on these
+   two tiles the hover response is the photo lift, not a change of ground. */
+.task-window--feature,
+.task-window--feature:hover,
+.task-window--feature:focus-visible { background: var(--bg); }
+
 .tile-body {
   position: relative;
   display: flex; flex-direction: column; gap: 0.4rem;
