@@ -4,19 +4,19 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Arsenij Arsiriy — Information Management Student | Resume &amp; Projects</title>
-    <meta name="description" content="Resume and project portfolio of Arsenij Arsiriy — Information Management student at PJATK, Warsaw. Business systems, IT projects, operations coordination.">
+    <meta name="description" data-i18n content="Resume and project portfolio of Arsenij Arsiriy — Information Management student at PJATK, Warsaw. Business systems, IT projects, operations coordination." data-pl-content="CV i portfolio projektów Arsenija Arsirija — studenta zarządzania informacją w PJATK w Warszawie. Systemy biznesowe, projekty IT, koordynacja operacyjna.">
     <meta name="author" content="Arsenij Arsiriy">
     <meta name="theme-color" content="#0a0a0a">
 
     <meta property="og:type" content="profile">
-    <meta property="og:title" content="Arsenij Arsiriy — Information Management Student">
-    <meta property="og:description" content="Resume and project portfolio. Business systems, IT projects, operations coordination. Warsaw, Poland.">
+    <meta property="og:title" data-i18n content="Arsenij Arsiriy — Information Management Student" data-pl-content="Arsenij Arsiriy — student zarządzania informacją">
+    <meta property="og:description" data-i18n content="Resume and project portfolio. Business systems, IT projects, operations coordination. Warsaw, Poland." data-pl-content="CV i portfolio projektów. Systemy biznesowe, projekty IT, koordynacja operacyjna. Warszawa, Polska.">
     <meta property="og:image" content="assets/og-cover.jpg">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Arsenij Arsiriy — Information Management Student">
-    <meta name="twitter:description" content="Resume and project portfolio. Business systems, IT projects, operations coordination.">
+    <meta name="twitter:title" data-i18n content="Arsenij Arsiriy — Information Management Student" data-pl-content="Arsenij Arsiriy — student zarządzania informacją">
+    <meta name="twitter:description" data-i18n content="Resume and project portfolio. Business systems, IT projects, operations coordination." data-pl-content="CV i portfolio projektów. Systemy biznesowe, projekty IT, koordynacja operacyjna.">
     <meta name="twitter:image" content="assets/og-cover.jpg">
 
     <link rel="icon" href="assets/favicon.png" type="image/png">
@@ -32,20 +32,27 @@
   </head>
 
   <body>
-    <a class="skip-link" href="#main-content">Skip to main content</a>
+    <a class="skip-link" href="#main-content"><span lang="en">Skip to main content</span><span lang="pl">Przejdź do treści głównej</span></a>
 
     <header class="site-header" id="top">
-      <nav class="nav" id="sectionNav" aria-label="Resume sections">
-        <a class="nav-link" href="#profile">Profile</a>
-        <a class="nav-link" href="#capabilities">Capabilities</a>
-        <a class="nav-link" href="#experience">Experience</a>
-        <a class="nav-link" href="#work">Work</a>
-        <a class="nav-link" href="#contact">Contact</a>
+      <nav class="nav" id="sectionNav" data-i18n aria-label="Resume sections" data-pl-aria-label="Sekcje CV">
+        <a class="nav-link" href="#profile"><span lang="en">Profile</span><span lang="pl">Profil</span></a>
+        <a class="nav-link" href="#capabilities"><span lang="en">Capabilities</span><span lang="pl">Kompetencje</span></a>
+        <a class="nav-link" href="#experience"><span lang="en">Experience</span><span lang="pl">Doświadczenie</span></a>
+        <a class="nav-link" href="#work"><span lang="en">Work</span><span lang="pl">Projekty</span></a>
+        <a class="nav-link" href="#contact"><span lang="en">Contact</span><span lang="pl">Kontakt</span></a>
       </nav>
       <div class="header-actions">
+        <div class="lang-switch" role="group" data-i18n
+             aria-label="Language" data-pl-aria-label="Język">
+          <!-- No lang attribute: these are language codes, not translatable
+               text, and tagging them would hide each button in the other mode. -->
+          <button class="lang-btn" type="button" data-lang-set="en" aria-pressed="true">EN</button>
+          <button class="lang-btn" type="button" data-lang-set="pl" aria-pressed="false">PL</button>
+        </div>
         <button class="btn btn--accent btn--sm" type="button" data-cv-open>
           <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11m0 0 4-4m-4 4-4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
-          <span>Download CV</span>
+          <span lang="en">Download CV</span><span lang="pl">Pobierz CV</span>
         </button>
       </div>
     </header>
@@ -59,20 +66,26 @@
         <div class="hero">
           <h1 class="hero-name">Arsenij<span class="hero-name-last">Arsiriy</span></h1>
           <div class="hero-meta">
-            <p class="hero-role">Information Management Student</p>
-            <p class="hero-location">Warsaw, Poland</p>
-            <p class="hero-summary">
+            <p class="hero-role"><span lang="en">Information Management Student</span><span lang="pl">Student zarządzania informacją</span></p>
+            <p class="hero-location"><span lang="en">Warsaw, Poland</span><span lang="pl">Warszawa, Polska</span></p>
+            <p class="hero-summary" lang="en">
               Information Management student at PJATK with experience in international client
               communication, operations coordination, and IT-related academic projects. Interested in
               project management, business systems, IT implementations, and technology-driven process
               optimization.
             </p>
+            <p class="hero-summary" lang="pl">
+              Student zarządzania informacją w PJATK z doświadczeniem w komunikacji z klientem
+              międzynarodowym, koordynacji operacyjnej oraz w projektach akademickich związanych z IT.
+              Zainteresowany zarządzaniem projektami, systemami biznesowymi, wdrożeniami IT oraz
+              optymalizacją procesów opartą na technologii.
+            </p>
           <div class="hero-actions">
             <button class="btn btn--accent" type="button" data-cv-open>
               <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11m0 0 4-4m-4 4-4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
-              <span>Download CV</span>
+              <span lang="en">Download CV</span><span lang="pl">Pobierz CV</span>
             </button>
-            <a class="btn" href="#profile" data-window-link="profile">View profile</a>
+            <a class="btn" href="#profile" data-window-link="profile"><span lang="en">View profile</span><span lang="pl">Zobacz profil</span></a>
           </div>
           <p class="hero-links">
             <a href="https://www.linkedin.com/in/arsenijarsiriy/" target="_blank" rel="noreferrer">LinkedIn</a>
@@ -80,58 +93,58 @@
           </p>
           </div>
           <p class="scroll-cue" aria-hidden="true">
-            More below
+            <span lang="en">More below</span><span lang="pl">Więcej poniżej</span>
             <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
           </p>
         </div>
 
         <!-- Tiles are real links: without JS they jump to the section below. -->
-        <nav class="task-grid" id="windowGrid" aria-label="Resume sections">
+        <nav class="task-grid" id="windowGrid" data-i18n aria-label="Resume sections" data-pl-aria-label="Sekcje CV">
           <a class="task-window task-window--feature" href="#profile" data-window="profile">
             <span class="tile-frame"><img class="tile-photo" src="assets/arsenij-photo-640.webp" width="640" height="640" alt="" decoding="async"></span>
             <span class="tile-body">
-              <span class="tile-title">Profile</span>
-              <span class="tile-kicker">Who I am, quick facts, and the CV</span>
-              <span class="tile-cta">Open</span>
+              <span class="tile-title"><span lang="en">Profile</span><span lang="pl">Profil</span></span>
+              <span class="tile-kicker"><span lang="en">Who I am, quick facts, and the CV</span><span lang="pl">Kim jestem, najważniejsze fakty i CV</span></span>
+              <span class="tile-cta"><span lang="en">Open</span><span lang="pl">Otwórz</span></span>
             </span>
           </a>
 
           <a class="task-window task-window--feature" href="#work" data-window="work">
             <span class="tile-frame"><img class="tile-photo tile-photo--contain" src="assets/unilife-preview.webp" width="1200" height="800" alt="" loading="lazy" decoding="async"></span>
             <span class="tile-body">
-              <span class="tile-title">Work</span>
-              <span class="tile-kicker">5 projects — Android app, databases, analysis</span>
-              <span class="tile-cta">Open</span>
+              <span class="tile-title"><span lang="en">Work</span><span lang="pl">Projekty</span></span>
+              <span class="tile-kicker"><span lang="en">5 projects — Android app, databases, analysis</span><span lang="pl">5 projektów — aplikacja na Androida, bazy danych, analiza</span></span>
+              <span class="tile-cta"><span lang="en">Open</span><span lang="pl">Otwórz</span></span>
             </span>
           </a>
 
           <a class="task-window task-window--wide" href="#capabilities" data-window="capabilities">
             <span class="tile-body">
-              <span class="tile-title">Capabilities</span>
-              <span class="tile-kicker">Tools, technical basics, education</span>
+              <span class="tile-title"><span lang="en">Capabilities</span><span lang="pl">Kompetencje</span></span>
+              <span class="tile-kicker"><span lang="en">Tools, technical basics, education</span><span lang="pl">Narzędzia, podstawy techniczne, edukacja</span></span>
               <span class="tile-chips">
                 <span class="chip">ERP Systems</span>
                 <span class="chip">SQL</span>
-                <span class="chip">Project Management</span>
+                <span class="chip"><span lang="en">Project Management</span><span lang="pl">Zarządzanie projektami</span></span>
                 <span class="chip">Jira</span>
               </span>
-              <span class="tile-cta">Open</span>
+              <span class="tile-cta"><span lang="en">Open</span><span lang="pl">Otwórz</span></span>
             </span>
           </a>
 
           <a class="task-window" href="#experience" data-window="experience">
             <span class="tile-body">
-              <span class="tile-title">Experience</span>
-              <span class="tile-kicker">Freight Broker at Landstar</span>
-              <span class="tile-cta">Open</span>
+              <span class="tile-title"><span lang="en">Experience</span><span lang="pl">Doświadczenie</span></span>
+              <span class="tile-kicker"><span lang="en">Freight Broker at Landstar</span><span lang="pl">Spedytor w Landstar</span></span>
+              <span class="tile-cta"><span lang="en">Open</span><span lang="pl">Otwórz</span></span>
             </span>
           </a>
 
           <a class="task-window" href="#contact" data-window="contact">
             <span class="tile-body">
-              <span class="tile-title">Contact</span>
-              <span class="tile-kicker">Email, phone, links</span>
-              <span class="tile-cta">Open</span>
+              <span class="tile-title"><span lang="en">Contact</span><span lang="pl">Kontakt</span></span>
+              <span class="tile-kicker"><span lang="en">Email, phone, links</span><span lang="pl">E-mail, telefon, linki</span></span>
+              <span class="tile-cta"><span lang="en">Open</span><span lang="pl">Otwórz</span></span>
             </span>
           </a>
         </nav>
@@ -148,40 +161,48 @@
     -->
     <div class="doc-source" id="content">
 
-      <section class="doc-section" id="profile" data-title="Profile" data-number="01" data-kicker="Information Management / Operations / IT Projects">
+      <section class="doc-section" id="profile" data-title="Profile" data-title-pl="Profil" data-number="01" data-kicker="Information Management / Operations / IT Projects">
         <header class="doc-head">
-          <p class="doc-index">Profile</p>
-          <p class="doc-kicker">Information Management / Operations / IT Projects</p>
+          <p class="doc-index"><span lang="en">Profile</span><span lang="pl">Profil</span></p>
+          <p class="doc-kicker"><span lang="en">Information Management / Operations / IT Projects</span><span lang="pl">Zarządzanie informacją / Operacje / Projekty IT</span></p>
         </header>
 
         <div class="profile-layout">
           <div class="profile-main">
-            <h2 class="doc-lead">Bridging operations, business systems, and IT projects.</h2>
-            <p class="body-text">
+            <h2 class="doc-lead" lang="en">Bridging operations, business systems, and IT projects.</h2>
+            <h2 class="doc-lead" lang="pl">Łączę operacje, systemy biznesowe i projekty IT.</h2>
+            <p class="body-text" lang="en">
               Information Management student with experience in international client communication,
               operations coordination, and IT-related university projects. Currently focused on
               project management, business systems, IT implementations, and practical process
               optimization.
             </p>
+            <p class="body-text" lang="pl">
+              Student zarządzania informacją z doświadczeniem w komunikacji z klientem
+              międzynarodowym, koordynacji operacyjnej oraz w projektach uczelnianych związanych
+              z IT. Obecnie skupiony na zarządzaniu projektami, systemach biznesowych, wdrożeniach
+              IT oraz praktycznej optymalizacji procesów.
+            </p>
             <ul class="tag-list">
-              <li class="tag">Client communication</li>
-              <li class="tag">Operations coordination</li>
-              <li class="tag">Business systems</li>
-              <li class="tag">IT implementation</li>
-              <li class="tag">Process optimization</li>
+              <li class="tag"><span lang="en">Client communication</span><span lang="pl">Komunikacja z klientem</span></li>
+              <li class="tag"><span lang="en">Operations coordination</span><span lang="pl">Koordynacja operacyjna</span></li>
+              <li class="tag"><span lang="en">Business systems</span><span lang="pl">Systemy biznesowe</span></li>
+              <li class="tag"><span lang="en">IT implementation</span><span lang="pl">Wdrożenia IT</span></li>
+              <li class="tag"><span lang="en">Process optimization</span><span lang="pl">Optymalizacja procesów</span></li>
             </ul>
             <div class="profile-cta">
               <button class="btn btn--accent" type="button" data-cv-open>
                 <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11m0 0 4-4m-4 4-4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
-                <span>Download CV</span>
+                <span lang="en">Download CV</span><span lang="pl">Pobierz CV</span>
               </button>
-              <a class="btn" href="mailto:arsenijarsiriy@gmail.com">Email me</a>
+              <a class="btn" href="mailto:arsenijarsiriy@gmail.com"><span lang="en">Email me</span><span lang="pl">Napisz do mnie</span></a>
             </div>
           </div>
 
           <figure class="profile-portrait">
             <img src="assets/arsenij-photo-1000.webp" width="1000" height="1000"
-                 alt="Portrait of Arsenij Arsiriy" loading="lazy" decoding="async">
+                 alt="Portrait of Arsenij Arsiriy" data-i18n data-pl-alt="Portret Arsenija Arsirija"
+                 loading="lazy" decoding="async">
           </figure>
 
           <!-- Each section carries one abstract solid in the same glyph medium
@@ -192,37 +213,38 @@
           <canvas class="doc-field doc-field--column" data-solid="gyro" aria-hidden="true"></canvas>
 
           <dl class="fact-row">
-            <div class="fact"><dt>Focus</dt><dd>IT &amp; business systems</dd></div>
-            <div class="fact"><dt>Education</dt><dd>PJATK, 2024–2027</dd></div>
-            <div class="fact"><dt>Experience</dt><dd>Operations &amp; freight</dd></div>
-            <div class="fact"><dt>Languages</dt><dd>UA · RU · PL · EN</dd></div>
+            <div class="fact"><dt><span lang="en">Focus</span><span lang="pl">Specjalizacja</span></dt><dd><span lang="en">IT &amp; business systems</span><span lang="pl">IT i systemy biznesowe</span></dd></div>
+            <div class="fact"><dt><span lang="en">Education</span><span lang="pl">Wykształcenie</span></dt><dd>PJATK, 2024–2027</dd></div>
+            <div class="fact"><dt><span lang="en">Experience</span><span lang="pl">Doświadczenie</span></dt><dd><span lang="en">Operations &amp; freight</span><span lang="pl">Operacje i spedycja</span></dd></div>
+            <div class="fact"><dt><span lang="en">Languages</span><span lang="pl">Języki</span></dt><dd>UA · RU · PL · EN</dd></div>
           </dl>
         </div>
       </section>
 
-      <section class="doc-section" id="capabilities" data-title="Capabilities" data-number="02" data-kicker="Tools / Direction / Education">
+      <section class="doc-section" id="capabilities" data-title="Capabilities" data-title-pl="Kompetencje" data-number="02" data-kicker="Tools / Direction / Education">
         <canvas class="doc-field" data-solid="turbine" aria-hidden="true"></canvas>
         <header class="doc-head">
-          <p class="doc-index">Capabilities</p>
-          <p class="doc-kicker">Tools / Direction / Education</p>
+          <p class="doc-index"><span lang="en">Capabilities</span><span lang="pl">Kompetencje</span></p>
+          <p class="doc-kicker"><span lang="en">Tools / Direction / Education</span><span lang="pl">Narzędzia / Kierunek / Edukacja</span></p>
         </header>
 
-        <h2 class="doc-lead">ERP systems, digital transformation, automation, and practical project delivery.</h2>
+        <h2 class="doc-lead" lang="en">ERP systems, digital transformation, automation, and practical project delivery.</h2>
+        <h2 class="doc-lead" lang="pl">Systemy ERP, transformacja cyfrowa, automatyzacja i praktyczna realizacja projektów.</h2>
 
         <div class="panel-grid">
           <article class="panel panel--feature">
-            <h3 class="panel-label">Interests &amp; Direction</h3>
+            <h3 class="panel-label"><span lang="en">Interests &amp; Direction</span><span lang="pl">Zainteresowania i kierunek</span></h3>
             <ul class="tag-list">
-              <li class="tag">ERP Systems</li>
-              <li class="tag">Project Management</li>
-              <li class="tag">Business Systems</li>
-              <li class="tag">Digital Transformation</li>
-              <li class="tag">Automation &amp; AI Tools</li>
+              <li class="tag"><span lang="en">ERP Systems</span><span lang="pl">Systemy ERP</span></li>
+              <li class="tag"><span lang="en">Project Management</span><span lang="pl">Zarządzanie projektami</span></li>
+              <li class="tag"><span lang="en">Business Systems</span><span lang="pl">Systemy biznesowe</span></li>
+              <li class="tag"><span lang="en">Digital Transformation</span><span lang="pl">Transformacja cyfrowa</span></li>
+              <li class="tag"><span lang="en">Automation &amp; AI Tools</span><span lang="pl">Automatyzacja i narzędzia AI</span></li>
             </ul>
           </article>
 
           <article class="panel">
-            <h3 class="panel-label">Tools</h3>
+            <h3 class="panel-label"><span lang="en">Tools</span><span lang="pl">Narzędzia</span></h3>
             <ul class="tag-list">
               <li class="tag">Jira</li><li class="tag">Git</li><li class="tag">Android Studio</li>
               <li class="tag">Microsoft Excel</li><li class="tag">Microsoft Access</li>
@@ -232,7 +254,7 @@
           </article>
 
           <article class="panel">
-            <h3 class="panel-label">Technical Basics</h3>
+            <h3 class="panel-label"><span lang="en">Technical Basics</span><span lang="pl">Podstawy techniczne</span></h3>
             <ul class="tag-list">
               <li class="tag">SQL</li><li class="tag">Python</li><li class="tag">Java</li>
               <li class="tag">HTML</li><li class="tag">CSS</li><li class="tag">JavaScript</li>
@@ -240,151 +262,168 @@
           </article>
 
           <article class="panel">
-            <h3 class="panel-label">Business &amp; Operations</h3>
+            <h3 class="panel-label"><span lang="en">Business &amp; Operations</span><span lang="pl">Biznes i operacje</span></h3>
             <ul class="tag-list">
-              <li class="tag">Client communication</li><li class="tag">Negotiation</li>
-              <li class="tag">Documentation</li><li class="tag">Process coordination</li>
-              <li class="tag">Cold-calling</li><li class="tag">Problem-solving</li>
+              <li class="tag"><span lang="en">Client communication</span><span lang="pl">Komunikacja z klientem</span></li><li class="tag"><span lang="en">Negotiation</span><span lang="pl">Negocjacje</span></li>
+              <li class="tag"><span lang="en">Documentation</span><span lang="pl">Dokumentacja</span></li><li class="tag"><span lang="en">Process coordination</span><span lang="pl">Koordynacja procesów</span></li>
+              <li class="tag"><span lang="en">Cold-calling</span><span lang="pl">Cold calling</span></li><li class="tag"><span lang="en">Problem-solving</span><span lang="pl">Rozwiązywanie problemów</span></li>
             </ul>
           </article>
 
           <article class="panel">
-            <h3 class="panel-label">Languages</h3>
+            <h3 class="panel-label"><span lang="en">Languages</span><span lang="pl">Języki</span></h3>
             <ul class="lang-list">
-              <li><span>Ukrainian</span><b>Native</b></li>
-              <li><span>Russian</span><b>Native</b></li>
-              <li><span>Polish</span><b>Native</b></li>
-              <li><span>English</span><b>C1 · IELTS 8.0</b></li>
+              <li><span><span lang="en">Ukrainian</span><span lang="pl">ukraiński</span></span><b><span lang="en">Native</span><span lang="pl">ojczysty</span></b></li>
+              <li><span><span lang="en">Russian</span><span lang="pl">rosyjski</span></span><b><span lang="en">Native</span><span lang="pl">ojczysty</span></b></li>
+              <li><span><span lang="en">Polish</span><span lang="pl">polski</span></span><b><span lang="en">Native</span><span lang="pl">ojczysty</span></b></li>
+              <li><span><span lang="en">English</span><span lang="pl">angielski</span></span><b>C1 · IELTS 8.0</b></li>
             </ul>
           </article>
 
           <article class="panel">
-            <h3 class="panel-label">Additional</h3>
+            <h3 class="panel-label"><span lang="en">Additional</span><span lang="pl">Dodatkowe</span></h3>
             <ul class="tag-list">
-              <li class="tag">Category B Driving License</li>
-              <li class="tag">Aviation interest</li>
+              <li class="tag"><span lang="en">Category B Driving License</span><span lang="pl">Prawo jazdy kat. B</span></li>
+              <li class="tag"><span lang="en">Aviation interest</span><span lang="pl">Zainteresowanie lotnictwem</span></li>
             </ul>
           </article>
         </div>
 
-        <h3 class="sub-label">Education</h3>
+        <h3 class="sub-label"><span lang="en">Education</span><span lang="pl">Wykształcenie</span></h3>
         <ol class="timeline">
           <li class="timeline-item">
-            <p class="timeline-date">2024 — Present</p>
+            <p class="timeline-date"><span lang="en">2024 — Present</span><span lang="pl">2024 — obecnie</span></p>
             <div>
-              <h4>Polish-Japanese Academy of Information Technology (PJATK)</h4>
-              <p class="meta">BEng in Information Management · Expected 2027</p>
-              <p class="body-text">
+              <h4><span lang="en">Polish-Japanese Academy of Information Technology (PJATK)</span><span lang="pl">Polsko-Japońska Akademia Technik Komputerowych (PJATK)</span></h4>
+              <p class="meta"><span lang="en">BEng in Information Management · Expected 2027</span><span lang="pl">Inżynier, zarządzanie informacją · planowo 2027</span></p>
+              <p class="body-text" lang="en">
                 Coursework includes Databases, Information Systems Design, ERP Systems, Business
                 Process Modeling, Statistical Data Analysis, IT Project Management, Computer Networks
                 &amp; Cybersecurity, Object-Oriented Programming, Web Development, and Intelligent
                 Management Systems.
+              </p>
+              <p class="body-text" lang="pl">
+                Program studiów obejmuje bazy danych, projektowanie systemów informacyjnych, systemy
+                ERP, modelowanie procesów biznesowych, statystyczną analizę danych, zarządzanie
+                projektami IT, sieci komputerowe i cyberbezpieczeństwo, programowanie obiektowe,
+                tworzenie stron internetowych oraz inteligentne systemy zarządzania.
               </p>
             </div>
           </li>
           <li class="timeline-item">
             <p class="timeline-date">2023 — 2024</p>
             <div>
-              <h4>University of Warsaw</h4>
-              <p class="meta">Internal Security</p>
-              <p class="body-text">Academic program in internal security.</p>
+              <h4><span lang="en">University of Warsaw</span><span lang="pl">Uniwersytet Warszawski</span></h4>
+              <p class="meta"><span lang="en">Internal Security</span><span lang="pl">Bezpieczeństwo wewnętrzne</span></p>
+              <p class="body-text"><span lang="en">Academic program in internal security.</span><span lang="pl">Studia na kierunku bezpieczeństwo wewnętrzne.</span></p>
             </div>
           </li>
           <li class="timeline-item">
             <p class="timeline-date">2019 — 2023</p>
             <div>
-              <h4>Janusz Korczak High School No. 2 in Warsaw</h4>
-              <p class="meta">Secondary Education</p>
-              <p class="body-text">Completed high school education in Warsaw.</p>
+              <h4><span lang="en">Janusz Korczak High School No. 2 in Warsaw</span><span lang="pl">II Liceum Ogólnokształcące im. Janusza Korczaka w Warszawie</span></h4>
+              <p class="meta"><span lang="en">Secondary Education</span><span lang="pl">Wykształcenie średnie</span></p>
+              <p class="body-text"><span lang="en">Completed high school education in Warsaw.</span><span lang="pl">Ukończone liceum ogólnokształcące w Warszawie.</span></p>
             </div>
           </li>
         </ol>
       </section>
 
-      <section class="doc-section" id="experience" data-title="Experience" data-number="03" data-kicker="Operations / Communication / Coordination">
+      <section class="doc-section" id="experience" data-title="Experience" data-title-pl="Doświadczenie" data-number="03" data-kicker="Operations / Communication / Coordination">
         <canvas class="doc-field" data-solid="altimeter" aria-hidden="true"></canvas>
         <header class="doc-head">
-          <p class="doc-index">Experience</p>
-          <p class="doc-kicker">Operations / Communication / Coordination</p>
+          <p class="doc-index"><span lang="en">Experience</span><span lang="pl">Doświadczenie</span></p>
+          <p class="doc-kicker"><span lang="en">Operations / Communication / Coordination</span><span lang="pl">Operacje / Komunikacja / Koordynacja</span></p>
         </header>
 
-        <h2 class="doc-lead">International operations, negotiation, and client communication.</h2>
+        <h2 class="doc-lead" lang="en">International operations, negotiation, and client communication.</h2>
+        <h2 class="doc-lead" lang="pl">Operacje międzynarodowe, negocjacje i komunikacja z klientem.</h2>
 
         <article class="job">
           <div class="job-head">
             <div>
-              <h3>Freight Broker</h3>
+              <h3><span lang="en">Freight Broker</span><span lang="pl">Spedytor</span></h3>
               <p class="meta">Landstar</p>
             </div>
-            <p class="job-date">Jul 2025 — Dec 2025 · Hybrid</p>
+            <p class="job-date"><span lang="en">Jul 2025 — Dec 2025 · Hybrid</span><span lang="pl">lip. 2025 — gru. 2025 · hybrydowo</span></p>
           </div>
           <ul class="bullets">
-            <li>Coordinated freight transportation operations across the United States, Canada, and Mexico.</li>
-            <li>Negotiated pricing and transport conditions with clients and carriers while managing multiple shipments simultaneously.</li>
-            <li>Built and maintained communication with clients and truck drivers throughout the delivery process.</li>
-            <li>Prepared contracts and operational documentation in an English-speaking international environment.</li>
-            <li>Conducted outbound communication and client acquisition through cold-calling.</li>
-            <li>Received positive feedback for fast onboarding, communication skills, and ability to close deals early into the role.</li>
+            <li lang="en">Coordinated freight transportation operations across the United States, Canada, and Mexico.</li>
+            <li lang="pl">Koordynowałem operacje transportu towarowego na terenie Stanów Zjednoczonych, Kanady i Meksyku.</li>
+            <li lang="en">Negotiated pricing and transport conditions with clients and carriers while managing multiple shipments simultaneously.</li>
+            <li lang="pl">Negocjowałem stawki i warunki transportu z klientami oraz przewoźnikami, prowadząc jednocześnie wiele zleceń.</li>
+            <li lang="en">Built and maintained communication with clients and truck drivers throughout the delivery process.</li>
+            <li lang="pl">Budowałem i utrzymywałem kontakt z klientami oraz kierowcami przez cały proces dostawy.</li>
+            <li lang="en">Prepared contracts and operational documentation in an English-speaking international environment.</li>
+            <li lang="pl">Przygotowywałem umowy i dokumentację operacyjną w międzynarodowym, anglojęzycznym środowisku.</li>
+            <li lang="en">Conducted outbound communication and client acquisition through cold-calling.</li>
+            <li lang="pl">Prowadziłem działania wychodzące i pozyskiwanie klientów metodą cold callingu.</li>
+            <li lang="en">Received positive feedback for fast onboarding, communication skills, and ability to close deals early into the role.</li>
+            <li lang="pl">Otrzymałem pozytywne opinie za szybkie wdrożenie się, umiejętności komunikacyjne oraz zdolność do domykania transakcji już na początku pracy.</li>
           </ul>
         </article>
       </section>
 
-      <section class="doc-section" id="work" data-title="Work" data-number="04" data-kicker="Projects / Systems / Analysis">
+      <section class="doc-section" id="work" data-title="Work" data-title-pl="Projekty" data-number="04" data-kicker="Projects / Systems / Analysis">
         <canvas class="doc-field" data-solid="prop" aria-hidden="true"></canvas>
         <header class="doc-head">
-          <p class="doc-index">Work</p>
-          <p class="doc-kicker">Projects / Systems / Analysis</p>
+          <p class="doc-index"><span lang="en">Work</span><span lang="pl">Projekty</span></p>
+          <p class="doc-kicker"><span lang="en">Projects / Systems / Analysis</span><span lang="pl">Projekty / Systemy / Analiza</span></p>
         </header>
 
-        <h2 class="doc-lead">Academic systems, practical tools, and business analysis.</h2>
+        <h2 class="doc-lead" lang="en">Academic systems, practical tools, and business analysis.</h2>
+        <h2 class="doc-lead" lang="pl">Systemy akademickie, praktyczne narzędzia i analiza biznesowa.</h2>
 
         <div class="rail-wrap">
-          <ul class="rail" id="projectRail" tabindex="0" role="list" aria-label="Projects — scroll horizontally">
+          <ul class="rail" id="projectRail" tabindex="0" role="list" data-i18n aria-label="Projects — scroll horizontally" data-pl-aria-label="Projekty — przewijaj poziomo">
 
             <li class="pcard">
               <div class="pcard-media">
-                <img src="assets/unilife-preview.webp" width="1200" height="800" alt="UniLife Android app screens" loading="lazy" decoding="async">
-                <span class="pcard-badge">Android App</span>
+                <img src="assets/unilife-preview.webp" width="1200" height="800" alt="UniLife Android app screens" data-i18n data-pl-alt="Ekrany aplikacji UniLife na Androida" loading="lazy" decoding="async">
+                <span class="pcard-badge"><span lang="en">Android App</span><span lang="pl">Aplikacja na Androida</span></span>
               </div>
               <div class="pcard-body">
-                <h3>University Life Management Android Application</h3>
-                <p>Personal academic Android project focused on improving university organization and productivity with schedules, notes, exams, deadline tracking, student support tools, and OCR-based schedule import.</p>
+                <h3><span lang="en">University Life Management Android Application</span><span lang="pl">Aplikacja na Androida do organizacji życia studenckiego</span></h3>
+                <p lang="en">Personal academic Android project focused on improving university organization and productivity with schedules, notes, exams, deadline tracking, student support tools, and OCR-based schedule import.</p>
+                <p lang="pl">Autorski projekt akademicki na Androida, którego celem jest usprawnienie organizacji studiów i produktywności: plan zajęć, notatki, egzaminy, śledzenie terminów, narzędzia wspierające studenta oraz import planu zajęć w oparciu o OCR.</p>
                 <ul class="tag-list tag-list--sm">
                   <li class="tag">Kotlin</li><li class="tag">Jetpack Compose</li><li class="tag">Room</li>
                   <li class="tag">MVVM</li><li class="tag">Material 3</li><li class="tag">ML Kit OCR</li>
                   <li class="tag">Gradle</li>
                 </ul>
                 <a class="btn btn--sm" href="https://github.com/ArsArsAr/UniLife_App" target="_blank" rel="noreferrer">
-                  View on GitHub<span class="sr-only"> — University Life Management Android Application</span>
+                  <span lang="en">View on GitHub</span><span lang="pl">Zobacz na GitHubie</span><span class="sr-only"> — <span lang="en">University Life Management Android Application</span><span lang="pl">Aplikacja na Androida do organizacji życia studenckiego</span></span>
                 </a>
               </div>
             </li>
 
             <li class="pcard">
               <div class="pcard-media">
-                <img src="assets/ashtea-marketing-preview.webp" width="1000" height="562" alt="Product and market analysis document cover" loading="lazy" decoding="async">
-                <span class="pcard-badge">PDF · 15 pages</span>
+                <img src="assets/ashtea-marketing-preview.webp" width="1000" height="562" alt="Product and market analysis document cover" data-i18n data-pl-alt="Okładka dokumentu analizy produktu i rynku" loading="lazy" decoding="async">
+                <span class="pcard-badge"><span lang="en">PDF · 15 pages</span><span lang="pl">PDF · 15 stron</span></span>
               </div>
               <div class="pcard-body">
-                <h3>Product &amp; Market Analysis Project</h3>
-                <p>University business project involving market analysis, product concept development, branding strategy, and marketing planning.</p>
+                <h3><span lang="en">Product &amp; Market Analysis Project</span><span lang="pl">Projekt analizy produktu i rynku</span></h3>
+                <p lang="en">University business project involving market analysis, product concept development, branding strategy, and marketing planning.</p>
+                <p lang="pl">Uczelniany projekt biznesowy obejmujący analizę rynku, opracowanie koncepcji produktu, strategię marki oraz planowanie marketingowe.</p>
                 <ul class="tag-list tag-list--sm">
                   <li class="tag">Market Analysis</li><li class="tag">Branding</li><li class="tag">Planning</li>
                 </ul>
                 <button class="btn btn--sm" type="button" data-pdf="ashtea">
-                  Read the document<span class="sr-only"> — Product and Market Analysis Project</span>
+                  <span lang="en">Read the document</span><span lang="pl">Przeczytaj dokument</span><span class="sr-only"> — <span lang="en">Product and Market Analysis Project</span><span lang="pl">Projekt analizy produktu i rynku</span></span>
                 </button>
               </div>
             </li>
 
             <li class="pcard">
               <div class="pcard-media">
-                <img src="assets/model-agency-erd.webp" width="1200" height="750" alt="Entity relationship diagram for a model agency database, with Model, Agent, Casting, Campaign, Contract and Payment entities" loading="lazy" decoding="async">
+                <img src="assets/model-agency-erd.webp" width="1200" height="750" alt="Entity relationship diagram for a model agency database, with Model, Agent, Casting, Campaign, Contract and Payment entities" data-i18n data-pl-alt="Diagram związków encji dla bazy danych agencji modelek, z encjami Modelka, Agent, Casting, Kampania, Umowa i Płatność" loading="lazy" decoding="async">
                 <span class="pcard-badge">ERD · SQL</span>
               </div>
               <div class="pcard-body">
-                <h3>Model Agency Database System</h3>
-                <p>University ERD and database project covering models, agents, castings, campaigns, contracts, and payments. Modelled as an entity relationship diagram, then implemented and queried in DataGrip, with triggers enforcing booking rules and keeping contract and payment records consistent.</p>
+                <h3><span lang="en">Model Agency Database System</span><span lang="pl">System bazodanowy agencji modelek</span></h3>
+                <p lang="en">University ERD and database project covering models, agents, castings, campaigns, contracts, and payments. Modelled as an entity relationship diagram, then implemented and queried in DataGrip, with triggers enforcing booking rules and keeping contract and payment records consistent.</p>
+                <p lang="pl">Uczelniany projekt ERD i bazy danych obejmujący modelki, agentów, castingi, kampanie, umowy i płatności. Zamodelowany jako diagram związków encji, następnie zaimplementowany i odpytywany w DataGrip, z wyzwalaczami egzekwującymi zasady rezerwacji i utrzymującymi spójność zapisów umów oraz płatności.</p>
                 <ul class="tag-list tag-list--sm">
                   <li class="tag">Microsoft Access</li><li class="tag">DataGrip</li><li class="tag">SQL</li>
                   <li class="tag">Triggers</li><li class="tag">ERD</li><li class="tag">Databases</li>
@@ -394,12 +433,13 @@
 
             <li class="pcard">
               <div class="pcard-media">
-                <img src="assets/uml-bpmn-preview.webp" width="1200" height="750" alt="BPMN process diagram with swimlanes for sales, warehouse, production, accounting and logistics departments, above a collaboration diagram" loading="lazy" decoding="async">
+                <img src="assets/uml-bpmn-preview.webp" width="1200" height="750" alt="BPMN process diagram with swimlanes for sales, warehouse, production, accounting and logistics departments, above a collaboration diagram" data-i18n data-pl-alt="Diagram procesu BPMN z torami dla działów sprzedaży, magazynu, produkcji, księgowości i logistyki, nad diagramem współpracy" loading="lazy" decoding="async">
                 <span class="pcard-badge">UML · BPMN</span>
               </div>
               <div class="pcard-body">
-                <h3>UML System Design Projects</h3>
-                <p>A series of university modelling projects: mapping how a business actually runs, then designing the system around it. Processes were laid out as BPMN diagrams with swimlanes per department, supported by UML class, use case, and sequence diagrams, and simulated end to end in Bizagi Modeler to time each path, find the bottlenecks, and check the design held up before anything was built.</p>
+                <h3><span lang="en">UML System Design Projects</span><span lang="pl">Projekty projektowania systemów w UML</span></h3>
+                <p lang="en">A series of university modelling projects: mapping how a business actually runs, then designing the system around it. Processes were laid out as BPMN diagrams with swimlanes per department, supported by UML class, use case, and sequence diagrams, and simulated end to end in Bizagi Modeler to time each path, find the bottlenecks, and check the design held up before anything was built.</p>
+                <p lang="pl">Seria uczelnianych projektów modelowania: odwzorowanie tego, jak firma faktycznie działa, a następnie zaprojektowanie systemu wokół tego. Procesy przedstawiono jako diagramy BPMN z torami dla poszczególnych działów, uzupełnione diagramami klas, przypadków użycia i sekwencji w UML, oraz zasymulowano od początku do końca w Bizagi Modeler, aby zmierzyć czas każdej ścieżki, znaleźć wąskie gardła i sprawdzić, czy projekt się broni, zanim cokolwiek powstało.</p>
                 <ul class="tag-list tag-list--sm">
                   <li class="tag">UML</li><li class="tag">BPMN</li><li class="tag">Bizagi Modeler</li>
                   <li class="tag">Process Simulation</li><li class="tag">Systems Design</li>
@@ -409,63 +449,69 @@
 
             <li class="pcard">
               <div class="pcard-media">
-                <img src="assets/portfolio-site-preview.webp" width="1200" height="750" alt="Landing page of this portfolio site: large serif name, ASCII aircraft animation, and a grid of section tiles" loading="lazy" decoding="async">
-                <span class="pcard-badge">Live Site</span>
+                <img src="assets/portfolio-site-preview.webp" width="1200" height="750" alt="Landing page of this portfolio site: large serif name, ASCII aircraft animation, and a grid of section tiles" data-i18n data-pl-alt="Strona główna tego portfolio: duże szeryfowe imię, animacja samolotu ASCII i siatka kafelków sekcji" loading="lazy" decoding="async">
+                <span class="pcard-badge"><span lang="en">Live Site</span><span lang="pl">Działająca strona</span></span>
               </div>
               <div class="pcard-body">
-                <h3>Personal CV / Portfolio Website</h3>
-                <p>This site. Static, dependency-free portfolio built as a desktop-style shell, with the resume content server-rendered for search engines and a no-JavaScript fallback.</p>
+                <h3><span lang="en">Personal CV / Portfolio Website</span><span lang="pl">Osobista strona CV / portfolio</span></h3>
+                <p lang="en">This site. Static, dependency-free portfolio built as a desktop-style shell, with the resume content server-rendered for search engines and a no-JavaScript fallback.</p>
+                <p lang="pl">Ta strona. Statyczne portfolio bez zewnętrznych zależności, zbudowane jako powłoka w stylu pulpitu, z treścią CV renderowaną po stronie serwera dla wyszukiwarek i wersją zapasową działającą bez JavaScriptu.</p>
                 <ul class="tag-list tag-list--sm">
                   <li class="tag">HTML</li><li class="tag">CSS</li><li class="tag">JavaScript</li>
                 </ul>
                 <a class="btn btn--sm" href="https://github.com/ArsArsAr" target="_blank" rel="noreferrer">
-                  GitHub<span class="sr-only"> — Personal CV / Portfolio Website</span>
+                  GitHub<span class="sr-only"> — <span lang="en">Personal CV / Portfolio Website</span><span lang="pl">Osobista strona CV / portfolio</span></span>
                 </a>
               </div>
             </li>
           </ul>
 
           <div class="rail-nav">
-            <button class="rail-arrow" type="button" data-rail="prev" aria-label="Previous project">
+            <button class="rail-arrow" type="button" data-rail="prev" data-i18n aria-label="Previous project" data-pl-aria-label="Poprzedni projekt">
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5 8 12l7 7"/></svg>
             </button>
-            <div class="rail-dots" id="railDots" role="tablist" aria-label="Choose project"></div>
-            <button class="rail-arrow" type="button" data-rail="next" aria-label="Next project">
+            <div class="rail-dots" id="railDots" role="tablist" data-i18n aria-label="Choose project" data-pl-aria-label="Wybierz projekt"></div>
+            <button class="rail-arrow" type="button" data-rail="next" data-i18n aria-label="Next project" data-pl-aria-label="Następny projekt">
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>
             </button>
           </div>
         </div>
       </section>
 
-      <section class="doc-section" id="contact" data-title="Contact" data-number="05" data-kicker="CV / Links / Availability">
+      <section class="doc-section" id="contact" data-title="Contact" data-title-pl="Kontakt" data-number="05" data-kicker="CV / Links / Availability">
         <header class="doc-head">
-          <p class="doc-index">Contact</p>
-          <p class="doc-kicker">CV / Links / Availability</p>
+          <p class="doc-index"><span lang="en">Contact</span><span lang="pl">Kontakt</span></p>
+          <p class="doc-kicker"><span lang="en">CV / Links / Availability</span><span lang="pl">CV / Linki / Dostępność</span></p>
         </header>
 
         <div class="contact-layout">
           <div>
-            <h2 class="doc-lead">Let's discuss business, systems, and IT projects.</h2>
-            <p class="body-text">
+            <h2 class="doc-lead" lang="en">Let's discuss business, systems, and IT projects.</h2>
+            <h2 class="doc-lead" lang="pl">Porozmawiajmy o biznesie, systemach i projektach IT.</h2>
+            <p class="body-text" lang="en">
               Open to conversations around business systems, project coordination, IT
               implementations, and practical technology-driven process improvement.
             </p>
+            <p class="body-text" lang="pl">
+              Otwarty na rozmowy o systemach biznesowych, koordynacji projektów, wdrożeniach IT
+              oraz praktycznym usprawnianiu procesów z wykorzystaniem technologii.
+            </p>
             <button class="btn btn--accent btn--block" type="button" data-cv-open>
               <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11m0 0 4-4m-4 4-4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
-              <span>Download CV</span>
+              <span lang="en">Download CV</span><span lang="pl">Pobierz CV</span>
             </button>
           </div>
 
           <ul class="contact-list">
             <li>
               <a href="mailto:arsenijarsiriy@gmail.com">
-                <span class="contact-label">Email</span>
+                <span class="contact-label"><span lang="en">Email</span><span lang="pl">E-mail</span></span>
                 <span class="contact-value">arsenijarsiriy@gmail.com</span>
               </a>
             </li>
             <li>
               <a href="tel:+48792256649">
-                <span class="contact-label">Phone</span>
+                <span class="contact-label"><span lang="en">Phone</span><span lang="pl">Telefon</span></span>
                 <span class="contact-value">+48 792 256 649</span>
               </a>
             </li>
@@ -483,8 +529,8 @@
             </li>
             <li>
               <a href="https://www.google.com/maps/place/Warsaw" target="_blank" rel="noreferrer">
-                <span class="contact-label">Location</span>
-                <span class="contact-value">Warsaw, Poland</span>
+                <span class="contact-label"><span lang="en">Location</span><span lang="pl">Lokalizacja</span></span>
+                <span class="contact-value"><span lang="en">Warsaw, Poland</span><span lang="pl">Warszawa, Polska</span></span>
               </a>
             </li>
           </ul>
@@ -502,17 +548,19 @@
       <div class="stage-backdrop" data-close-window></div>
       <div class="stage-window" role="dialog" aria-modal="true" aria-labelledby="windowTitle">
         <div class="window-toolbar">
-          <div class="traffic" role="group" aria-label="Window controls">
+          <div class="traffic" role="group" data-i18n aria-label="Window controls" data-pl-aria-label="Przyciski okna">
             <button class="traffic-btn traffic-btn--close" type="button" data-glyph="✕"
-                    data-window-action="close" title="Close" aria-label="Close window"></button>
+                    data-window-action="close" data-i18n title="Close" data-pl-title="Zamknij"
+                    aria-label="Close window" data-pl-aria-label="Zamknij okno"></button>
             <button class="traffic-btn traffic-btn--min" type="button" data-glyph="−"
-                    data-window-action="minimize" title="Minimize" aria-label="Minimize to overview"></button>
+                    data-window-action="minimize" data-i18n title="Minimize" data-pl-title="Minimalizuj"
+                    aria-label="Minimize to overview" data-pl-aria-label="Minimalizuj do przeglądu"></button>
             <button class="traffic-btn traffic-btn--zoom" type="button" data-glyph="⤡"
                     data-window-action="zoom" title="Exit full screen" aria-label="Exit full screen"></button>
           </div>
           <p class="window-title" id="windowTitle">Window</p>
           <button class="btn btn--sm window-close" type="button" data-close-window>
-            <span>Overview</span>
+            <span lang="en">Overview</span><span lang="pl">Przegląd</span>
             <kbd>Esc</kbd>
           </button>
         </div>

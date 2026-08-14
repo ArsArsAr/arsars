@@ -19,6 +19,97 @@
     return node;
   };
 
+  /* --- Language ----------------------------------------------------------- */
+  /* Both languages are in the markup; CSS shows one and removes the other from
+     the flow. This only has to move the pieces CSS cannot reach: attributes,
+     the strings this file builds, and <html lang> itself — which matters,
+     because it is what tells a screen reader which voice to read the page in.
+
+     Order of preference: an explicit ?lang= in the URL (so a link can be sent
+     in a chosen language), then a previous choice, then the browser's own
+     setting, then English. */
+
+  const LANGS = ["en", "pl"];
+
+  const UI = {
+    en: {
+      docTitle:  "Arsenij Arsiriy — Information Management Student | Resume & Projects",
+      cvTitle:   "Download CV", close: "Close",
+      cvEn: "English version", cvPl: "Polish version",
+      cvAria:    (n) => `Download CV — ${n}`,
+      document:  "Document", prevPage: "Previous page", nextPage: "Next page",
+      original:  "Original PDF", pageOf: (a, b) => `Page ${a} of ${b}`,
+      full: "Enter full screen", exitFull: "Exit full screen",
+      railView:  (i, n) => `Projects, view ${i} of ${n}`,
+      ashtea:    "Product & Market Analysis Project",
+    },
+    pl: {
+      docTitle:  "Arsenij Arsiriy — student zarządzania informacją | CV i projekty",
+      cvTitle:   "Pobierz CV", close: "Zamknij",
+      cvEn: "wersja angielska", cvPl: "wersja polska",
+      cvAria:    (n) => `Pobierz CV — ${n}`,
+      document:  "Dokument", prevPage: "Poprzednia strona", nextPage: "Następna strona",
+      original:  "Oryginalny PDF", pageOf: (a, b) => `Strona ${a} z ${b}`,
+      full: "Tryb pełnoekranowy", exitFull: "Wyjdź z trybu pełnoekranowego",
+      railView:  (i, n) => `Projekty, widok ${i} z ${n}`,
+      ashtea:    "Projekt analizy produktu i rynku",
+    },
+  };
+
+  let lang = "en";
+  const t = (k, ...a) => {
+    const v = UI[lang][k];
+    return typeof v === "function" ? v(...a) : v;
+  };
+  // Things that must be relabelled when the language changes, registered by
+  // the code that builds them so nothing has to be hunted for later.
+  const relabellers = [];
+  const onLangChange = (fn) => { relabellers.push(fn); fn(); };
+
+  /* Attributes carry their Polish value in data-pl-*: data-pl-alt becomes alt,
+     data-pl-aria-label becomes aria-label. The English value is cached on the
+     first swap so switching back is exact rather than reconstructed. */
+  const attrCache = new WeakMap();
+  const applyAttrs = () => {
+    $$("[data-i18n]").forEach((node) => {
+      let cache = attrCache.get(node);
+      if (!cache) { cache = {}; attrCache.set(node, cache); }
+      for (const key of Object.keys(node.dataset)) {
+        const m = /^pl([A-Z].*)$/.exec(key);
+        if (!m) continue;
+        const attr = m[1].replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase();
+        if (!(attr in cache)) cache[attr] = node.getAttribute(attr) || "";
+        node.setAttribute(attr, lang === "pl" ? node.dataset[key] : cache[attr]);
+      }
+    });
+  };
+
+  const setLang = (next, remember = true) => {
+    lang = LANGS.includes(next) ? next : "en";
+    const root = document.documentElement;
+    root.lang = lang;
+    root.dataset.lang = lang;
+    document.title = t("docTitle");
+    applyAttrs();
+    $$("[data-lang-set]").forEach((b) =>
+      b.setAttribute("aria-pressed", String(b.dataset.langSet === lang)));
+    relabellers.forEach((fn) => fn());
+    if (remember) { try { localStorage.setItem("lang", lang); } catch { /* private mode */ } }
+  };
+
+  $$("[data-lang-set]").forEach((b) =>
+    b.addEventListener("click", () => setLang(b.dataset.langSet)));
+
+  {
+    const fromUrl = new URLSearchParams(location.search).get("lang");
+    let saved = null;
+    try { saved = localStorage.getItem("lang"); } catch { /* private mode */ }
+    const fromBrowser = (navigator.language || "").slice(0, 2).toLowerCase();
+    const pick = [fromUrl, saved, fromBrowser].find((v) => LANGS.includes(v));
+    // Don't persist a guess made from the browser's setting — only a real choice.
+    setLang(pick || "en", Boolean(fromUrl || saved));
+  }
+
   /* --- Sticky header shadow ---------------------------------------------- */
 
   const header = $(".site-header");
@@ -676,29 +767,42 @@
 
   /* --- CV download picker ------------------------------------------------- */
 
+  /* The two CVs are the documents themselves, so their codes never translate —
+     only the description of what each one is. */
   const CV_FILES = [
-    { code: "EN", name: "English version", href: "assets/arsenij-arsiriy-resume-en.pdf", file: "Arsenij_Arsiriy_Resume_ENG.pdf" },
-    { code: "PL", name: "Polish version",  href: "assets/arsenij-arsiriy-resume-pl.pdf", file: "Arsenij_Arsiriy_Resume_PL.pdf" }
+    { code: "EN", key: "cvEn", href: "assets/arsenij-arsiriy-resume-en.pdf", file: "Arsenij_Arsiriy_Resume_ENG.pdf" },
+    { code: "PL", key: "cvPl", href: "assets/arsenij-arsiriy-resume-pl.pdf", file: "Arsenij_Arsiriy_Resume_PL.pdf" }
   ];
 
   const cv = makeDialog("cv-modal");
   {
     const bar = el("div", "modal-bar");
-    const title = el("h2", null, "Download CV");
-    const closeBtn = el("button", "btn btn--sm", "Close");
+    const title = el("h2", null, "");
+    const closeBtn = el("button", "btn btn--sm", "");
     closeBtn.type = "button";
     closeBtn.addEventListener("click", cv.close);
     bar.append(title, closeBtn);
 
     const grid = el("div", "cv-grid");
+    const names = [];
     CV_FILES.forEach((f) => {
       const a = el("a", `cv-choice cv-choice--${f.code.toLowerCase()}`);
       a.href = f.href;
       a.download = f.file;
-      a.setAttribute("aria-label", `Download CV — ${f.name}`);
-      a.append(el("span", "cv-code", f.code), el("span", "cv-name", f.name));
+      const name = el("span", "cv-name");
+      a.append(el("span", "cv-code", f.code), name);
       a.addEventListener("click", () => setTimeout(cv.close, 120));
       grid.appendChild(a);
+      names.push({ a, name, key: f.key });
+    });
+
+    onLangChange(() => {
+      title.textContent = t("cvTitle");
+      closeBtn.textContent = t("close");
+      names.forEach(({ a, name, key }) => {
+        name.textContent = t(key);
+        a.setAttribute("aria-label", t("cvAria", t(key)));
+      });
     });
 
     cv.dlg.append(bar, grid);
@@ -712,7 +816,7 @@
 
   const DOCS = {
     ashtea: {
-      title: "Product & Market Analysis Project",
+      key: "ashtea",
       pattern: "assets/ashtea-pages-webp/page-{n}.webp",
       pages: 15,
       source: "assets/ashtea-marketing-project.pdf"
@@ -721,7 +825,7 @@
 
   const pdf = makeDialog("pdf-modal");
   const pdfState = { doc: null, page: 1 };
-  const pdfTitle = el("h2", null, "Document");
+  const pdfTitle = el("h2", null, "");
   const pdfCount = el("span", "pdf-count", "1 / 1");
   const pdfPrev  = el("button", "rail-arrow", null);
   const pdfNext  = el("button", "rail-arrow", null);
@@ -732,16 +836,27 @@
       btn.setAttribute("aria-label", label);
       btn.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${d}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
     };
-    arrow(pdfPrev, "M15 5 8 12l7 7", "Previous page");
-    arrow(pdfNext, "m9 5 7 7-7 7", "Next page");
+    arrow(pdfPrev, "M15 5 8 12l7 7", "");
+    arrow(pdfNext, "m9 5 7 7-7 7", "");
 
-    const source = el("a", "btn btn--sm", "Original PDF");
+    const source = el("a", "btn btn--sm", "");
     source.target = "_blank";
     source.rel = "noreferrer";
 
-    const closeBtn = el("button", "btn btn--sm", "Close");
+    const closeBtn = el("button", "btn btn--sm", "");
     closeBtn.type = "button";
     closeBtn.addEventListener("click", pdf.close);
+
+    onLangChange(() => {
+      pdfPrev.setAttribute("aria-label", t("prevPage"));
+      pdfNext.setAttribute("aria-label", t("nextPage"));
+      source.textContent = t("original");
+      closeBtn.textContent = t("close");
+      // The heading holds a document's own title while one is open, and the
+      // generic word only when nothing is loaded yet.
+      if (!pdfState.doc) pdfTitle.textContent = t("document");
+      else pdfTitle.textContent = t(pdfState.doc.key);
+    });
 
     const controls = el("div", "pdf-controls");
     controls.append(pdfPrev, pdfCount, pdfNext, source);
@@ -777,6 +892,7 @@
     pdfImg.decode ? pdfImg.decode().then(clear, clear) : pdfImg.addEventListener("load", clear, { once: true });
 
     pdfCount.textContent = `${pdfState.page} / ${doc.pages}`;
+    pdfCount.setAttribute("aria-label", t("pageOf", pdfState.page, doc.pages));
     pdfPrev.disabled = pdfState.page <= 1;
     pdfNext.disabled = pdfState.page >= doc.pages;
     // Warm the next page so paging feels instant.
@@ -797,7 +913,7 @@
     if (!doc) return;
     e.preventDefault();
     pdfState.doc = doc;
-    pdfTitle.textContent = doc.title;
+    pdfTitle.textContent = t(doc.key);
     pdf._source.href = doc.source;
     showPage(1);
     pdf.open();
@@ -867,7 +983,7 @@
         dotsBox.appendChild(dot);
       }
       [...dotsBox.children].forEach((d, i) =>
-        d.setAttribute("aria-label", `Projects, view ${i + 1} of ${stops.length}`));
+        d.setAttribute("aria-label", t("railView", i + 1, stops.length)));
     };
 
     const nearest = () => {
@@ -994,7 +1110,8 @@
       stageWindow.style.removeProperty("--from-h");
     }
 
-    windowTitle.textContent = entry.node.dataset.title || id;
+    windowTitle.textContent =
+      (lang === "pl" && entry.node.dataset.titlePl) || entry.node.dataset.title || id;
     windowBody.replaceChildren(entry.node);
     windowBody.scrollTop = 0;
 
@@ -1083,7 +1200,7 @@
     windowed = on;
     stageWindow.classList.toggle("is-windowed", on);
     zoomBtn.dataset.glyph = on ? "⤢" : "⤡";
-    const label = on ? "Enter full screen" : "Exit full screen";
+    const label = on ? t("full") : t("exitFull");
     zoomBtn.title = label;
     zoomBtn.setAttribute("aria-label", label);
   };

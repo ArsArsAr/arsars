@@ -275,6 +275,46 @@ button, a { -webkit-tap-highlight-color: transparent; }
 }
 .tag-list--sm .tag { min-height: 1.6rem; padding: 0.1rem 0.55rem; font-size: 0.72rem; }
 
+/* Language ------------------------------------------------------------------
+   Both languages ship in the markup. The inactive one is taken out of the flow
+   entirely rather than hidden visually, so it costs no layout, is not read out
+   by a screen reader, and does not turn up in the browser's find-on-page.
+
+   The document is English until told otherwise, so with JS off — or before the
+   script runs — the page is a valid English document and matches <html lang>.
+   Scoped to descendants, so the <html lang> attribute itself never matches. */
+/* Written as "anything that is not Polish mode" rather than "English mode", so
+   the absence of data-lang — the served markup, and every frame before the
+   script runs — is a valid English page. Pairing two positive rules instead
+   left both languages visible until JS arrived, and visible together for good
+   with JS off. */
+html:not([data-lang="pl"]) [lang="pl"] { display: none; }
+html[data-lang="pl"] [lang="en"] { display: none; }
+
+/* Segmented EN / PL control. Built from the same hairline-pill vocabulary as
+   .btn so it reads as part of the header's control set, not as a widget. */
+.lang-switch {
+  display: inline-flex; align-items: stretch;
+  border: 1px solid var(--line-strong); border-radius: 999px;
+  overflow: hidden;
+}
+.lang-btn {
+  display: inline-flex; align-items: center;
+  min-height: 2.25rem; padding: 0 0.7rem;
+  border: 0; background: transparent;
+  color: var(--ink-faint);
+  font-family: var(--font-mono);
+  font-size: var(--step--1); letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: background var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+.lang-btn:hover { color: var(--ink); }
+.lang-btn[aria-pressed="true"] {
+  background: var(--accent); color: var(--accent-ink);
+}
+/* The control is only meaningful once the script can act on it. */
+html:not(.js) .lang-switch { display: none; }
+
 /* 4. Header ================================================================ */
 
 .site-header {
