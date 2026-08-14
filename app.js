@@ -26,42 +26,50 @@
   addEventListener("scroll", onScroll, { passive: true });
   onScroll();
 
-  /* --- Signature: the ASCII airframe ------------------------------------ */
-  /* A three-dimensional aircraft rendered as a dithered glyph field. Moving
-     the cursor orbits the model, so the view pans around the airframe —
-     nose-on through broadside to tail — and tilts with vertical movement.
+  /* --- The glyph medium --------------------------------------------------- */
+  /* Solid geometry rendered as a dithered field of characters. Moving the
+     cursor orbits the model, so the view pans around it and tilts with
+     vertical movement.
 
-     This is a small software rasteriser, not line art: the mesh is built from
-     lofted fuselage rings plus wing/tail solids, transformed and projected per
-     frame, filled with a z-buffer, Lambert-shaded, then quantised to a glyph
-     ramp with ordered dithering. That dither is what produces the photographic
-     grain rather than flat banded fills.
+     This is a small software rasteriser, not line art: a mesh is transformed
+     and projected per frame, filled with a z-buffer, Lambert-shaded, then
+     quantised to a glyph ramp with ordered dithering. That dither is what
+     produces the photographic grain rather than flat banded fills.
 
      Canvas 2D rather than WebGL on purpose: the glyphs are the medium, the
-     triangle count is tiny, and this keeps the whole thing dependency-free. */
+     triangle count is tiny, and this keeps the whole thing dependency-free.
 
-  const initGlyphField = () => {
-    const canvas = $("#glyphField");
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d", { alpha: true });
-    if (!ctx) return;
+     The ramp, the dither and the light live here once. The shell's airframe
+     and the marks behind the document headers have to read as the same hand,
+     and two copies of this would drift apart inside a week. */
 
-    // Dark to bright. Index 0 is never drawn, so empty space stays empty.
-    const RAMP = " .'`^\",:;~+=*oaOZ#MW&8%B@";
-    // 4x4 ordered dither — breaks the ramp's banding into grain.
-    const BAYER = [
-      [0, 8, 2, 10], [12, 4, 14, 6], [3, 11, 1, 9], [15, 7, 13, 5],
-    ].map((r) => r.map((v) => v / 16));
+  // Dark to bright. Index 0 is never drawn, so empty space stays empty.
+  const RAMP = " .'`^\",:;~+=*oaOZ#MW&8%B@";
+  // 4x4 ordered dither — breaks the ramp's banding into grain.
+  const BAYER = [
+    [0, 8, 2, 10], [12, 4, 14, 6], [3, 11, 1, 9], [15, 7, 13, 5],
+  ].map((r) => r.map((v) => v / 16));
+  const TAU = Math.PI * 2;
 
-    /* ---- mesh ---------------------------------------------------------- */
-    // x: nose is +x. y: up. z: right wing is +z.
-    const verts = [];   // flat [x,y,z, ...]
-    const tris  = [];   // flat [i0,i1,i2, ...]
-    const spin  = [];   // per-triangle: 1 if it belongs to the propeller
+  // flags mark triangles the renderer treats specially — inked in the accent,
+  // and spun about the model axis where a spin rate is set. The airframe's
+  // propeller and the altimeter's needles use them.
+  const mesh = () => {
+    const m = { verts: [], tris: [], flags: [], spinFrom: Infinity };
+    m.V = (x, y, z) => { m.verts.push(x, y, z); return m.verts.length / 3 - 1; };
+    m.T = (a, b, c, f) => { m.tris.push(a, b, c); m.flags.push(f ? 1 : 0); };
+    m.quad = (a, b, c, d, f) => { m.T(a, b, c, f); m.T(a, c, d, f); };
+    return m;
+  };
 
-    const V = (x, y, z) => { verts.push(x, y, z); return verts.length / 3 - 1; };
-    const T = (a, b, c, isSpin) => { tris.push(a, b, c); spin.push(isSpin ? 1 : 0); };
-    const quad = (a, b, c, d, s) => { T(a, b, c, s); T(a, c, d, s); };
+  /* --- Signature: the ASCII airframe ------------------------------------ */
+  /* Lofted fuselage rings plus wing, tail, strut and gear solids.
+     x: nose is +x. y: up. z: right wing is +z. */
+
+  const buildAirframe = () => {
+    const m = mesh();
+    const { verts } = m;
+    const V = m.V, quad = m.quad;
 
     // Fuselage: lofted rings. [station x, radius y, radius z]
     const SECTIONS = [
@@ -164,15 +172,51 @@
     };
     blade(1); blade(-1);
 
-    const VCOUNT = verts.length / 3;
-    const src = new Float32Array(verts);
-    const world = new Float32Array(verts.length);
+    m.spinFrom = PROP_VERT_START;
+    return m;
+  };
+
+  /* --- Renderer ----------------------------------------------------------- */
+
+  const makeGlyphField = (canvas, build, tune = {}) => {
+    if (!canvas) return null;
+    const ctx = canvas.getContext("2d", { alpha: true });
+    if (!ctx) return null;
+
+    const o = {
+      yaw: 2.6, yawBias: 0.5,          // cursor pan, in radians across the field
+      pitch: 0.95, pitchBias: -0.15,
+      idle: 0,                          // autonomous sweep; 0 = still until the cursor moves
+      spin: 0,                          // rate for flagged geometry
+      fit: 0.56, ox: 0.44, oy: 0.33,    // framing, in fractions of the cell grid
+      camz: 4.2, lens: 2.2,
+      cell: 0,                          // glyph size; 0 follows the canvas width
+      ink: 1,                           // overall strength of the field
+      track: "self",                    // pointer frame: the canvas box, or the viewport
+      /* Ambient floor and the swing above it. The airframe is a thing of thin
+         panels and a hard key light suits it; a round solid under the same
+         light splits into a lit cap and a dead underside, so the marks lift
+         the floor and narrow the swing until the whole form carries value. */
+      amb: 0.34, range: 0.58,
+      /* Depth falloff. The bias sets where the near face clips to full ink, so
+         lowering it is what lets a large flat plate gradient across its own
+         depth instead of sitting at one value. */
+      fogBias: 1.5, fogRate: 0.55, fogFloor: 0.35,
+      ...tune,
+    };
+
+    const m = build();
+    const { tris, flags } = m;
+    const VCOUNT = m.verts.length / 3;
+    const SPIN_FROM = m.spinFrom;
+    const src = new Float32Array(m.verts);
+    const world = new Float32Array(m.verts.length);
 
     /* ---- render state -------------------------------------------------- */
     const state = { w: 0, h: 0, cell: 7, cols: 0, rows: 0, dpr: 1 };
     const pointer = { x: 0.5, y: 0.5, tx: 0.5, ty: 0.5 };
     let depth = new Float32Array(0), shade = new Float32Array(0), isProp = new Uint8Array(0);
-    let scrollNorm = 0, raf = 0, running = false;
+    let raf = 0, running = false, live = false, sized = false;
 
     const resize = () => {
       const r = canvas.getBoundingClientRect();
@@ -181,7 +225,7 @@
       canvas.width = Math.round(r.width * state.dpr);
       canvas.height = Math.round(r.height * state.dpr);
       ctx.setTransform(state.dpr, 0, 0, state.dpr, 0, 0);
-      state.cell = r.width > 1500 ? 8 : r.width > 1000 ? 7 : 6;
+      state.cell = o.cell || (r.width > 1500 ? 8 : r.width > 1000 ? 7 : 6);
       state.cols = Math.ceil(r.width / state.cell);
       state.rows = Math.ceil(r.height / (state.cell * 1.06));
       const n = state.cols * state.rows;
@@ -205,12 +249,14 @@
       pointer.y += (pointer.ty - pointer.y) * 0.05;
 
       const time = t / 1000;
-      // Cursor orbits the model: a full pan from one side to the other, plus a
-      // slow idle sweep so it is never completely static.
-      const yaw   = (pointer.x - 0.5) * 2.6 + Math.sin(time * 0.16) * 0.12 + 0.5;
-      const pitch = (pointer.y - 0.5) * 0.95 + Math.cos(time * 0.21) * 0.06 - 0.15;
-      const roll  = Math.sin(time * 0.27) * 0.05;
-      const propAngle = time * 9.0;
+      /* Cursor orbits the model: a full pan from one side to the other. The
+         shell's airframe adds a slow idle sweep on top so the signature is
+         never completely static; the document marks set idle to 0 and hold
+         still until the cursor asks them to move. */
+      const yaw   = (pointer.x - 0.5) * o.yaw + Math.sin(time * 0.16) * 0.12 * o.idle + o.yawBias;
+      const pitch = (pointer.y - 0.5) * o.pitch + Math.cos(time * 0.21) * 0.06 * o.idle + o.pitchBias;
+      const roll  = Math.sin(time * 0.27) * 0.05 * o.idle;
+      const propAngle = time * o.spin;
 
       const cy_ = Math.cos(yaw),   sy_ = Math.sin(yaw);
       const cp  = Math.cos(pitch), sp  = Math.sin(pitch);
@@ -220,7 +266,7 @@
       for (let i = 0; i < VCOUNT; i++) {
         let x = src[i * 3], y = src[i * 3 + 1], z = src[i * 3 + 2];
         // Spin the propeller about its own hub before the body transform.
-        if (i >= PROP_VERT_START) {
+        if (i >= SPIN_FROM) {
           const ny = y * cpa - z * spa, nz = y * spa + z * cpa;
           y = ny; z = nz;
         }
@@ -232,15 +278,15 @@
 
       // Perspective projection into cell space. Sits high in the empty band
       // between masthead and meta column so the airframe clears the tiles.
-      const scale = Math.min(state.w / cell, state.h / (cell * 1.06)) * 0.56;
-      const ox = cols * 0.44, oy = rows * 0.33;
-      const CAMZ = 4.2;
+      const scale = Math.min(state.w / cell, state.h / (cell * 1.06)) * o.fit;
+      const ox = cols * o.ox, oy = rows * o.oy;
+      const CAMZ = o.camz;
       const px = new Float32Array(VCOUNT), py = new Float32Array(VCOUNT), pz = new Float32Array(VCOUNT);
       for (let i = 0; i < VCOUNT; i++) {
         const zc = world[i * 3 + 2] + CAMZ;
         const inv = 1 / (zc || 1e-6);
-        px[i] = ox + world[i * 3] * scale * inv * 2.2;
-        py[i] = oy - world[i * 3 + 1] * scale * inv * 2.2;
+        px[i] = ox + world[i * 3] * scale * inv * o.lens;
+        py[i] = oy - world[i * 3 + 1] * scale * inv * o.lens;
         pz[i] = zc;
       }
 
@@ -272,8 +318,8 @@
         // Narrower value range: the old 0.20-1.00 swing put adjacent flat
         // panels at opposite ends of the ramp, which is what made the form
         // read as disfigured rather than shaded.
-        lam = 0.34 + Math.max(0, lam) * 0.58;
-        const propFace = spin[tI / 3];
+        lam = o.amb + Math.max(0, lam) * o.range;
+        const propFace = flags[tI / 3];
         if (propFace) lam = Math.min(1, lam + 0.25);
 
         const minX = Math.max(0, Math.floor(Math.min(ax, bx, cx)));
@@ -312,61 +358,293 @@
           const v = Math.max(0, Math.min(1, s + dith));
           const gi = Math.round(v * last);
           if (gi <= 0) continue;
-          // Depth fog, so the far side of the airframe recedes.
-          const fog = Math.max(0.35, Math.min(1, 1.5 - (depth[idx] - CAMZ) * 0.55));
+          // Depth fog, so the far side of the form recedes.
+          const fog = Math.max(o.fogFloor, Math.min(1, o.fogBias - (depth[idx] - CAMZ) * o.fogRate));
           // Accent is reserved for the propeller disc. Keying it off shading
           // instead painted whole wing panels orange, because a flat surface
           // shares one normal and clears any brightness threshold at once.
           ctx.fillStyle = isProp[idx]
-            ? `rgba(250, 76, 20, ${0.5 * fog})`
-            : `rgba(242, 242, 242, ${(0.10 + s * 0.30) * fog})`;
+            ? `rgba(250, 76, 20, ${0.5 * fog * o.ink})`
+            : `rgba(242, 242, 242, ${(0.10 + s * 0.30) * fog * o.ink})`;
           ctx.fillText(RAMP[gi], xq * cell + cell / 2, yq * chStep + chStep / 2);
         }
       }
     };
 
-    const frame = (t) => { draw(t); raf = requestAnimationFrame(frame); };
-    const start = () => { if (!running) { running = true; raf = requestAnimationFrame(frame); } };
-    const stop  = () => { running = false; cancelAnimationFrame(raf); };
+    /* A field with no idle sweep has nothing to say once the view has caught
+       up with the cursor, so the loop parks itself rather than repainting an
+       identical frame forever. Five marks that each hold still cost nothing;
+       five marks each running a rasteriser at 60fps would be indefensible. */
+    const settled = () =>
+      Math.abs(pointer.tx - pointer.x) < 4e-4 && Math.abs(pointer.ty - pointer.y) < 4e-4;
 
-    // CSS hides the field on phones; don't lay out or paint into a zero-box
-    // canvas, and don't start a loop that would only burn battery.
+    const frame = (t) => {
+      draw(t);
+      if (o.idle || !settled()) raf = requestAnimationFrame(frame);
+      else running = false;
+    };
+    const stop = () => { running = false; cancelAnimationFrame(raf); };
+
+    /* CSS hides these on phones, and a section is only laid out once it has
+       been lifted into the window — so never paint into a zero-box canvas. */
     const isVisible = () => canvas.offsetParent !== null && canvas.clientWidth > 0;
-    if (!isVisible()) {
-      addEventListener("resize", () => { if (isVisible()) { resize(); draw(performance.now()); } },
-        { once: true });
-      return;
+    const ensure = () => {
+      if (!isVisible()) return false;
+      if (!sized) { resize(); sized = true; }
+      return true;
+    };
+    const wake = () => {
+      if (running || !live || !ensure()) return;
+      running = true;
+      raf = requestAnimationFrame(frame);
+    };
+    // Paint immediately on becoming visible, rather than staying blank until
+    // the first animation frame lands.
+    const show = () => { if (ensure()) draw(performance.now()); };
+
+    /* Measure the canvas itself, every time its box changes — not once on
+       first sight. The window a section opens into animates from tile size to
+       full width over 480ms, so a mark at the top of the band gets its first
+       look while the canvas is still a couple of hundred pixels wide. Sizing
+       once there fixes the whole field at that width: the glyph grid stays
+       tiny and the form never recovers, which is the difference between a
+       readable solid and a smudge. (Profile's mark sits low enough that it is
+       only observed after the animation ends, which is why it escaped.) */
+    const remeasure = () => {
+      if (!isVisible()) return;
+      sized = false;
+      ensure();
+      draw(performance.now());
+    };
+    if (typeof ResizeObserver === "function") new ResizeObserver(remeasure).observe(canvas);
+    else addEventListener("resize", remeasure);
+
+    if (reduceMotion.matches) {
+      // One still frame is the whole story: no pointer tracking, no loop.
+      if ("IntersectionObserver" in window) {
+        new IntersectionObserver(([e]) => { if (e.isIntersecting) show(); }, { threshold: 0 })
+          .observe(canvas);
+      } else show();
+      return { show };
     }
 
-    resize();
-    // Paint immediately so the field is present on first paint rather than
-    // blank until the first animation frame lands.
-    draw(performance.now());
-    addEventListener("resize", () => { if (isVisible()) { resize(); draw(performance.now()); } });
-
-    if (reduceMotion.matches) return;   // the static frame above is the whole story
-
     addEventListener("pointermove", (e) => {
-      const r = canvas.getBoundingClientRect();
+      /* The document marks read the whole viewport. Mapping to their own box
+         would peg them at an extreme the moment the cursor crossed into the
+         text column, which is most of the time — the mark would sit frozen at
+         full deflection instead of tracking the hand. */
+      const r = o.track === "viewport"
+        ? { left: 0, top: 0, width: innerWidth, height: innerHeight }
+        : canvas.getBoundingClientRect();
       pointer.tx = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width));
       pointer.ty = Math.min(1, Math.max(0, (e.clientY - r.top) / r.height));
-    }, { passive: true });
-
-    addEventListener("scroll", () => {
-      scrollNorm = Math.min(1, scrollY / (innerHeight || 1));
+      wake();
     }, { passive: true });
 
     // Don't burn battery in a background tab or once it's scrolled away.
-    document.addEventListener("visibilitychange", () => document.hidden ? stop() : start());
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) stop(); else wake();
+    });
     if ("IntersectionObserver" in window) {
-      new IntersectionObserver(
-        ([entry]) => (entry.isIntersecting && !document.hidden) ? start() : stop(),
-        { threshold: 0 }
-      ).observe(canvas);
-    } else start();
+      new IntersectionObserver(([entry]) => {
+        live = entry.isIntersecting && !document.hidden;
+        if (live) { show(); wake(); } else stop();
+      }, { threshold: 0 }).observe(canvas);
+    } else { live = true; show(); wake(); }
+
+    return { show };
   };
 
-  initGlyphField();
+  /* --- Document solids ---------------------------------------------------- */
+  /* One abstract solid per section, cut from the same medium as the airframe.
+     Five silhouettes that stay apart at a glance — round, gridded, spiralling,
+     crossed, looped — so the set reads as a family rather than as one effect
+     pasted five times. They sit in the empty half of the header band, where
+     the 22ch lead leaves real space, and hold still until the cursor moves. */
+
+  // A quad grid over a parametric patch. Closed forms simply repeat their seam
+  // ring, which costs a few vertices and saves a wrap-around special case.
+  const patch = (m, uN, vN, fn) => {
+    const base = m.verts.length / 3;
+    for (let i = 0; i <= uN; i++)
+      for (let j = 0; j <= vN; j++) { const p = fn(i / uN, j / vN); m.V(p[0], p[1], p[2]); }
+    const at = (i, j) => base + i * (vN + 1) + j;
+    for (let i = 0; i < uN; i++)
+      for (let j = 0; j < vN; j++) m.quad(at(i, j), at(i + 1, j), at(i + 1, j + 1), at(i, j + 1));
+  };
+
+  /* Revolve a [radius, height] outline around the Y axis. Instrument bodies
+     are almost all lathe work — cases, bezels, hubs, spinners, dishes — so
+     this one primitive carries most of the set. */
+  const revolve = (m, outline, seg = 28) => {
+    const last = outline.length - 1;
+    patch(m, seg, last, (u, v) => {
+      const a = u * TAU, t = v * last;
+      const i = Math.min(last - 1, Math.floor(t)), f = t - i;
+      const r = outline[i][0] + (outline[i + 1][0] - outline[i][0]) * f;
+      const y = outline[i][1] + (outline[i + 1][1] - outline[i][1]) * f;
+      return [Math.cos(a) * r, y, Math.sin(a) * r];
+    });
+  };
+
+  /* Emit geometry, then move it. Lets the primitives stay axis-aligned and
+     simple while blades and needles get placed at real angles. */
+  const placed = (m, emit, at) => {
+    const from = m.verts.length;
+    emit();
+    for (let i = from; i < m.verts.length; i += 3) {
+      const p = at(m.verts[i], m.verts[i + 1], m.verts[i + 2]);
+      m.verts[i] = p[0]; m.verts[i + 1] = p[1]; m.verts[i + 2] = p[2];
+    }
+  };
+
+  // Spin about Y, for anything arranged around a hub.
+  const aboutY = (a) => (x, y, z) => {
+    const c = Math.cos(a), s = Math.sin(a);
+    return [x * c - z * s, y, x * s + z * c];
+  };
+  // Twist about X, for the pitch built into a blade.
+  const aboutX = (a) => (x, y, z) => {
+    const c = Math.cos(a), s = Math.sin(a);
+    return [x, y * c - z * s, y * s + z * c];
+  };
+  const chain = (...fns) => (x, y, z) => fns.reduce((p, f) => f(p[0], p[1], p[2]), [x, y, z]);
+
+  // Axis-aligned box. Corner index bits are x=4, y=2, z=1, set meaning +.
+  // The trailing flag paints the part in the accent, which is the only way a
+  // small feature reads against the body it sits on.
+  const box = (m, cx, cy, cz, hx, hy, hz, flag) => {
+    const b = m.verts.length / 3;
+    for (const sx of [-1, 1]) for (const sy of [-1, 1]) for (const sz of [-1, 1])
+      m.V(cx + sx * hx, cy + sy * hy, cz + sz * hz);
+    const q = (a, c, d, e) => m.quad(b + a, b + c, b + d, b + e, flag);
+    q(0, 1, 3, 2); q(4, 6, 7, 5);      // -x, +x
+    q(0, 4, 5, 1); q(2, 3, 7, 6);      // -y, +y
+    q(0, 2, 6, 4); q(1, 5, 7, 3);      // -z, +z
+  };
+
+  /* Instruments off the panel, one per section, all of them lathe work with
+     blades or needles set on top. Everything here is sized against one hard
+     limit learned the hard way: a feature thinner than a glyph cell renders
+     as loose dashes, not as an edge. At the size these run, that floor is
+     around 0.06 model units — so rims are thick, needles are wedges, and
+     blade counts stay low enough that each one owns a couple of cells. */
+  const SOLIDS = {
+    // Profile — attitude indicator: the gyro ball slung in two gimbals.
+    gyro: () => {
+      const m = mesh();
+      patch(m, 22, 13, (u, v) => {
+        const a = u * TAU, p = v * Math.PI, r = 0.60;
+        return [Math.sin(p) * Math.cos(a) * r, Math.cos(p) * r, Math.sin(p) * Math.sin(a) * r];
+      });
+      const gimbal = (R, at) => placed(m, () => patch(m, 32, 6, (u, v) => {
+        const a = u * TAU, t = v * TAU, rr = R + Math.cos(t) * 0.075;
+        return [Math.cos(a) * rr, Math.sin(t) * 0.075, Math.sin(a) * rr];
+      }), at);
+      gimbal(0.82, (x, y, z) => [x, y, z]);
+      gimbal(0.98, (x, y, z) => [x, -z, y]);   // second ring, stood on edge
+      return m;
+    },
+
+    // Capabilities — turbine: hub, blades, casing. Tools, and how they mesh.
+    turbine: () => {
+      const m = mesh();
+      revolve(m, [[0, -0.30], [0.32, -0.30], [0.32, 0.30], [0, 0.30]], 20);
+      const N = 9;
+      for (let i = 0; i < N; i++) {
+        placed(m, () => box(m, 0.66, 0, 0, 0.34, 0.028, 0.16),
+          chain(aboutX(0.62), aboutY((i / N) * TAU)));   // pitch, then round the hub
+      }
+      patch(m, 34, 6, (u, v) => {                        // casing
+        const a = u * TAU, t = v * TAU, rr = 1.10 + Math.cos(t) * 0.085;
+        return [Math.cos(a) * rr, Math.sin(t) * 0.085, Math.sin(a) * rr];
+      });
+      return m;
+    },
+
+    /* Experience — altimeter: hours on the clock. The face is sunk well below
+       the bezel so the dial has real depth, and the needles are accent-painted
+       wedges standing clear of it. Flush grey needles on a flat face share the
+       face's normal, so they shade identically and disappear. */
+    altimeter: () => {
+      const m = mesh();
+      revolve(m, [[0, -0.34], [0.90, -0.34], [0.90, 0.30],
+                  [0.72, 0.30], [0.72, -0.02], [0, -0.02]], 30);
+      placed(m, () => box(m, 0.30, 0, 0, 0.32, 0.055, 0.085, 1),
+        (x, y, z) => [x, y + 0.14, z]);
+      placed(m, () => box(m, 0.17, 0, 0, 0.20, 0.055, 0.105, 1),
+        chain(aboutY(2.15), (x, y, z) => [x, y + 0.15, z]));
+      revolve(m, [[0.14, 0.10], [0.14, 0.22], [0, 0.22]], 12);   // hub cap
+      return m;
+    },
+
+    // Work — propeller and spinner. The shell's signature, brought in close.
+    prop: () => {
+      const m = mesh();
+      // A long nose cone: it is the part that says "propeller" before the
+      // blades do, and a stubby hub read as a bolt head.
+      revolve(m, [[0, 0.86], [0.15, 0.52], [0.23, 0.14], [0.25, -0.16], [0, -0.16]], 22);
+      const N = 3;
+      for (let i = 0; i < N; i++) {
+        // Broad paddle blades, not spokes: three thin arms leave the disc
+        // mostly empty, and empty is what made this read as scaffolding.
+        placed(m, () => box(m, 0.66, 0, 0, 0.58, 0.042, 0.30),
+          chain(aboutX(0.40), aboutY((i / N) * TAU)));
+      }
+      return m;
+    },
+
+    // Contact — dish and feed horn: pointed out, waiting on an answer.
+    dish: () => {
+      const m = mesh();
+      patch(m, 30, 9, (u, v) => {              // paraboloid, opening upward
+        const a = u * TAU, r = v * 0.98;
+        return [Math.cos(a) * r, r * r * 0.62 - 0.24, Math.sin(a) * r];
+      });
+      revolve(m, [[0.115, -0.20], [0.115, 0.46], [0, 0.46]], 12);   // mast to the focus
+      box(m, 0, 0.54, 0, 0.11, 0.11, 0.11);                         // feed horn
+      revolve(m, [[0, -0.92], [0.34, -0.92], [0.24, -0.44], [0, -0.44]], 16);   // pedestal
+      return m;
+    },
+  };
+
+  /* Where each form rests before the cursor touches it. A torus seen edge-on
+     and three plates seen square-on both collapse to flat pattern, so each
+     solid gets the standing angle that shows what it is. */
+  /* Every instrument here is built about the Y axis, and pitch tips that axis
+     toward the camera — so these angles are what turn a face-on disc into an
+     instrument you can read the depth of. */
+  const SOLID_VIEW = {
+    gyro:      { pitchBias: -0.20 },                   // a ball; no axis to aim
+    turbine:   { pitchBias: 1.21, yawBias: -1.95 },    // looking into the intake
+    altimeter: { pitchBias: 1.05, yawBias: -2.05 },    // dial tipped toward the reader
+    prop:      { pitchBias: 1.21, yawBias: -2.02 },   // enough turn to show the cone
+    dish:      { pitchBias: 0.75, yawBias: -2.20 },    // mouth of the dish, from above
+  };
+
+  makeGlyphField($("#glyphField"), buildAirframe, { idle: 1, spin: 9.0 });
+
+  $$("[data-solid]").forEach((canvas) => {
+    const name = canvas.dataset.solid;
+    const build = SOLIDS[name];
+    if (!build) return;
+    makeGlyphField(canvas, build, {
+      /* Framed like the airframe, not like an icon. The first pass squeezed
+         these into the gap beside the lead, which capped them at ~20 cells of
+         7px type at partial ink — at that size the glyph shapes stop being
+         readable as glyphs and the whole thing turns to smear. A form needs
+         both real cells across it and cells you can actually see, so the band
+         was widened to give it room and the mark now runs at the shell's own
+         cell size and full ink. */
+      ox: 0.5, oy: 0.52, fit: 0.60, camz: 3.6, lens: 2.0,
+      yaw: 3.4, yawBias: 0.6, pitch: 1.2, pitchBias: -0.1,
+      cell: 7,
+      amb: 0.40, range: 0.46,
+      fogBias: 1.02, fogRate: 0.42, fogFloor: 0.30,
+      track: "viewport",
+      ...SOLID_VIEW[name],
+    });
+  });
 
   /* --- Dialog helper ------------------------------------------------------ */
   /* Native <dialog> gives us the top layer, ::backdrop and Esc for free; we
@@ -532,29 +810,71 @@
     const dotsBox = $("#railDots");
     if (!cards.length || !dotsBox) return () => {};
 
-    const dots = cards.map((card, i) => {
-      const dot = el("button", "rail-dot");
-      dot.type = "button";
-      dot.setAttribute("role", "tab");
-      dot.setAttribute("aria-selected", String(i === 0));
-      dot.setAttribute("aria-label", `Project ${i + 1} of ${cards.length}`);
-      dot.addEventListener("click", () => {
-        rail.scrollTo({ left: card.offsetLeft - rail.offsetLeft, behavior: reduceMotion.matches ? "auto" : "smooth" });
-      });
-      dotsBox.appendChild(dot);
-      return dot;
-    });
+    /* One dot per scroll position the rail can actually rest at, not one per
+       card. Three cards are visible at desktop width, so the last two can
+       never become the leading card — a dot each would leave two of them
+       permanently dead. Stops are measured, not assumed, so the count follows
+       the viewport. */
+    let stops = [];
 
-    const step = () => {
-      const gap = parseFloat(getComputedStyle(rail).columnGap) || 0;
-      return cards[0].getBoundingClientRect().width + gap;
+    const measure = () => {
+      const max = Math.max(0, rail.scrollWidth - rail.clientWidth);
+      /* scroll-padding-inline holds the leading card off the scroller's edge,
+         so the scrollLeft that snaps a card to "start" is its offset minus
+         that padding — not the offset itself. Without this every stop sits a
+         padding-width past where the snap engine parks the rail, and each
+         smooth scroll ends with a corrective jump. */
+      const cs = getComputedStyle(rail);
+      const pad = parseFloat(cs.scrollPaddingInlineStart) || parseFloat(cs.scrollPaddingLeft) || 0;
+      const out = [];
+      cards.forEach((card) => {
+        /* Clamped to the end of the track: the last cards can never lead, so
+           the ones that clamp to the same place are one stop, not several. */
+        const left = Math.round(Math.min(Math.max(0, card.offsetLeft - rail.offsetLeft - pad), max));
+        if (!out.length || left - out[out.length - 1] > 1) out.push(left);
+      });
+      return out.length ? out : [0];
+    };
+
+    /* Where a smooth scroll is headed, so a second arrow click steps on from
+       the destination instead of from wherever the animation happens to be
+       mid-flight — otherwise clicking through the rail quickly loses stops. */
+    let target = null;
+
+    const scrollToStop = (i) => {
+      target = i;
+      rail.scrollTo({ left: stops[i], behavior: reduceMotion.matches ? "auto" : "smooth" });
+    };
+
+    const buildDots = () => {
+      const next = measure();
+      const same = next.length === stops.length &&
+                   next.every((v, i) => Math.abs(v - stops[i]) < 1);
+      stops = next;
+      if (same) return;
+
+      /* Add or drop only the difference. The rail is remeasured on every frame
+         of the window's open animation, and wiping the row each time would
+         flash the dots and drop the selected one. */
+      while (dotsBox.children.length > stops.length) dotsBox.lastElementChild.remove();
+      while (dotsBox.children.length < stops.length) {
+        const dot = el("button", "rail-dot");
+        dot.type = "button";
+        dot.setAttribute("role", "tab");
+        dot.setAttribute("aria-selected", "false");
+        // Index read at click time — a dot's target moves as the rail resizes.
+        dot.addEventListener("click", () => scrollToStop([...dotsBox.children].indexOf(dot)));
+        dotsBox.appendChild(dot);
+      }
+      [...dotsBox.children].forEach((d, i) =>
+        d.setAttribute("aria-label", `Projects, view ${i + 1} of ${stops.length}`));
     };
 
     const nearest = () => {
       const x = rail.scrollLeft;
       let best = 0, bestDist = Infinity;
-      cards.forEach((card, i) => {
-        const d = Math.abs(card.offsetLeft - rail.offsetLeft - x);
+      stops.forEach((left, i) => {
+        const d = Math.abs(left - x);
         if (d < bestDist) { bestDist = d; best = i; }
       });
       return best;
@@ -565,14 +885,19 @@
 
     const sync = () => {
       const i = nearest();
-      dots.forEach((d, di) => d.setAttribute("aria-selected", String(di === i)));
-      const maxScroll = rail.scrollWidth - rail.clientWidth - 1;
-      if (prevBtn) prevBtn.disabled = rail.scrollLeft <= 1;
-      if (nextBtn) nextBtn.disabled = rail.scrollLeft >= maxScroll;
+      [...dotsBox.children].forEach((d, di) => d.setAttribute("aria-selected", String(di === i)));
+      if (prevBtn) prevBtn.disabled = i === 0;
+      if (nextBtn) nextBtn.disabled = i === stops.length - 1;
     };
 
-    const nudge = (dir) =>
-      rail.scrollBy({ left: dir * step(), behavior: reduceMotion.matches ? "auto" : "smooth" });
+    /* Aim at the neighbouring stop rather than nudging by a card width. A card
+       width isn't the distance between two stops at the end of the track, and
+       landing off a snap point makes the browser finish the smooth scroll and
+       then yank the rail into place — the stutter this used to have. */
+    const nudge = (dir) => {
+      const from = target != null && target < stops.length ? target : nearest();
+      scrollToStop(Math.max(0, Math.min(stops.length - 1, from + dir)));
+    };
 
     prevBtn?.addEventListener("click", () => nudge(-1));
     nextBtn?.addEventListener("click", () => nudge(1));
@@ -589,8 +914,25 @@
       requestAnimationFrame(() => { sync(); ticking = false; });
     }, { passive: true });
 
-    addEventListener("resize", sync);
-    return sync;
+    /* The rail has come to rest, so the queued destination is spent — whether
+       the smooth scroll finished it or the reader dragged somewhere else.
+       Safari has no scrollend yet, so fall back to arriving at the stop. */
+    if ("onscrollend" in rail) rail.addEventListener("scrollend", () => { target = null; });
+    else rail.addEventListener("scroll", () => {
+      if (target != null && Math.abs(rail.scrollLeft - stops[target]) < 2) target = null;
+    }, { passive: true });
+
+    const remeasure = () => { target = null; buildDots(); sync(); };
+
+    /* Watch the rail itself, not the viewport. The section has no layout while
+       it is parked in the hidden document source, and the window it opens into
+       animates from tile size to full width over 480ms — measured once at open
+       time the rail is still tile-narrow, so every card looks like a reachable
+       stop and the row grows dots the rail can never scroll to. The observer
+       also covers the windowed/maximised toggle, which resize never fires. */
+    if (typeof ResizeObserver === "function") new ResizeObserver(remeasure).observe(rail);
+    else addEventListener("resize", remeasure);
+    return remeasure;
   };
 
   const rail = $("#projectRail");

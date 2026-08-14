@@ -22,8 +22,8 @@
     <link rel="icon" href="assets/favicon.png" type="image/png">
     <link rel="apple-touch-icon" href="assets/favicon.png">
     <link rel="preload" as="image" href="assets/arsenij-photo-640.webp">
-    <link rel="preload" as="font" type="font/woff2" href="assets/fonts/garamond-var.woff2" crossorigin>
-    <link rel="preload" as="font" type="font/woff2" href="assets/fonts/archivo-var.woff2" crossorigin>
+    <link rel="preload" as="font" type="font/woff2" href="assets/fonts/zodiak-var.woff2" crossorigin>
+    <link rel="preload" as="font" type="font/woff2" href="assets/fonts/switzer-var.woff2" crossorigin>
     <link rel="preload" as="font" type="font/woff2" href="assets/fonts/dm-mono.woff2" crossorigin>
     <link rel="stylesheet" href="styles.css">
 
@@ -87,7 +87,7 @@
         <!-- Tiles are real links: without JS they jump to the section below. -->
         <nav class="task-grid" id="windowGrid" aria-label="Resume sections">
           <a class="task-window task-window--feature" href="#profile" data-window="profile">
-            <img class="tile-photo" src="assets/arsenij-photo-640.webp" width="640" height="640" alt="" decoding="async">
+            <span class="tile-frame"><img class="tile-photo" src="assets/arsenij-photo-640.webp" width="640" height="640" alt="" decoding="async"></span>
             <span class="tile-body">
               <span class="tile-title">Profile</span>
               <span class="tile-kicker">Who I am, quick facts, and the CV</span>
@@ -96,7 +96,7 @@
           </a>
 
           <a class="task-window task-window--feature" href="#work" data-window="work">
-            <img class="tile-photo tile-photo--contain" src="assets/unilife-preview.webp" width="1200" height="800" alt="" loading="lazy" decoding="async">
+            <span class="tile-frame"><img class="tile-photo tile-photo--contain" src="assets/unilife-preview.webp" width="1200" height="800" alt="" loading="lazy" decoding="async"></span>
             <span class="tile-body">
               <span class="tile-title">Work</span>
               <span class="tile-kicker">5 projects — Android app, databases, analysis</span>
@@ -183,6 +183,13 @@
                  alt="Portrait of Arsenij Arsiriy" loading="lazy" decoding="async">
           </figure>
 
+          <!-- Each section carries one abstract solid in the same glyph medium
+               as the shell's airframe. Decorative, hidden from assistive tech,
+               still until the cursor moves, absent under reduced motion.
+               This one sits under the portrait rather than behind the header,
+               because the portrait already owns that band. -->
+          <canvas class="doc-field doc-field--column" data-solid="gyro" aria-hidden="true"></canvas>
+
           <dl class="fact-row">
             <div class="fact"><dt>Focus</dt><dd>IT &amp; business systems</dd></div>
             <div class="fact"><dt>Education</dt><dd>PJATK, 2024–2027</dd></div>
@@ -193,6 +200,7 @@
       </section>
 
       <section class="doc-section" id="capabilities" data-title="Capabilities" data-number="02" data-kicker="Tools / Direction / Education">
+        <canvas class="doc-field" data-solid="turbine" aria-hidden="true"></canvas>
         <header class="doc-head">
           <p class="doc-index">Capabilities</p>
           <p class="doc-kicker">Tools / Direction / Education</p>
@@ -293,6 +301,7 @@
       </section>
 
       <section class="doc-section" id="experience" data-title="Experience" data-number="03" data-kicker="Operations / Communication / Coordination">
+        <canvas class="doc-field" data-solid="altimeter" aria-hidden="true"></canvas>
         <header class="doc-head">
           <p class="doc-index">Experience</p>
           <p class="doc-kicker">Operations / Communication / Coordination</p>
@@ -320,6 +329,7 @@
       </section>
 
       <section class="doc-section" id="work" data-title="Work" data-number="04" data-kicker="Projects / Systems / Analysis">
+        <canvas class="doc-field" data-solid="prop" aria-hidden="true"></canvas>
         <header class="doc-head">
           <p class="doc-index">Work</p>
           <p class="doc-kicker">Projects / Systems / Analysis</p>
@@ -367,29 +377,40 @@
             </li>
 
             <li class="pcard">
-              <div class="pcard-media pcard-media--glyph" data-glyph="DB" aria-hidden="true"></div>
+              <div class="pcard-media">
+                <img src="assets/model-agency-erd.webp" width="1200" height="750" alt="Entity relationship diagram for a model agency database, with Model, Agent, Casting, Campaign, Contract and Payment entities" loading="lazy" decoding="async">
+                <span class="pcard-badge">ERD · SQL</span>
+              </div>
               <div class="pcard-body">
-                <h3>Vehicle Workshop Database System</h3>
-                <p>University ERD and database project supported with Microsoft Access, covering customer management, orders, parts tracking, and relational structure design.</p>
+                <h3>Model Agency Database System</h3>
+                <p>University ERD and database project covering models, agents, castings, campaigns, contracts, and payments. Modelled as an entity relationship diagram, then implemented and queried in DataGrip, with triggers enforcing booking rules and keeping contract and payment records consistent.</p>
                 <ul class="tag-list tag-list--sm">
-                  <li class="tag">Microsoft Access</li><li class="tag">ERD</li><li class="tag">Databases</li>
+                  <li class="tag">Microsoft Access</li><li class="tag">DataGrip</li><li class="tag">SQL</li>
+                  <li class="tag">Triggers</li><li class="tag">ERD</li><li class="tag">Databases</li>
                 </ul>
               </div>
             </li>
 
             <li class="pcard">
-              <div class="pcard-media pcard-media--glyph" data-glyph="UML" aria-hidden="true"></div>
+              <div class="pcard-media">
+                <img src="assets/uml-bpmn-preview.webp" width="1200" height="750" alt="BPMN process diagram with swimlanes for sales, warehouse, production, accounting and logistics departments, above a collaboration diagram" loading="lazy" decoding="async">
+                <span class="pcard-badge">UML · BPMN</span>
+              </div>
               <div class="pcard-body">
                 <h3>UML System Design Projects</h3>
-                <p>Designed UML system plans for a cat cafe management system and a computer club management system.</p>
+                <p>A series of university modelling projects: mapping how a business actually runs, then designing the system around it. Processes were laid out as BPMN diagrams with swimlanes per department, supported by UML class, use case, and sequence diagrams, and simulated end to end in Bizagi Modeler to time each path, find the bottlenecks, and check the design held up before anything was built.</p>
                 <ul class="tag-list tag-list--sm">
-                  <li class="tag">UML</li><li class="tag">Systems Design</li><li class="tag">Modeling</li>
+                  <li class="tag">UML</li><li class="tag">BPMN</li><li class="tag">Bizagi Modeler</li>
+                  <li class="tag">Process Simulation</li><li class="tag">Systems Design</li>
                 </ul>
               </div>
             </li>
 
             <li class="pcard">
-              <div class="pcard-media pcard-media--glyph" data-glyph="WEB" aria-hidden="true"></div>
+              <div class="pcard-media">
+                <img src="assets/portfolio-site-preview.webp" width="1200" height="750" alt="Landing page of this portfolio site: large serif name, ASCII aircraft animation, and a grid of section tiles" loading="lazy" decoding="async">
+                <span class="pcard-badge">Live Site</span>
+              </div>
               <div class="pcard-body">
                 <h3>Personal CV / Portfolio Website</h3>
                 <p>This site. Static, dependency-free portfolio built as a desktop-style shell, with the resume content server-rendered for search engines and a no-JavaScript fallback.</p>
@@ -467,6 +488,11 @@
             </li>
           </ul>
         </div>
+
+        <!-- Contact's header band is a two-column layout with live text out to
+             the right edge, so this mark sits under the content instead — the
+             last section closing on a sign-off rather than opening with one. -->
+        <canvas class="doc-field doc-field--base" data-solid="dish" aria-hidden="true"></canvas>
       </section>
     </div>
 

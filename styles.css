@@ -8,24 +8,37 @@
 
 /* 1. Tokens ================================================================ */
 
-/* Type trio, mirroring the reference set: a high-contrast roman for display
-   (Dragonfly runs FK Roman at 280px), a grotesque for UI, a mono for data.
-   All three open-licensed and self-hosted — EB Garamond + a mono is exactly
-   Longbow's stack. */
+/* Type trio: a high-contrast roman for display, a grotesque for UI, a mono for
+   data. All three open-licensed and self-hosted.
+
+   Zodiak (ITF, free font licence) replaced EB Garamond as the display voice.
+   Garamond is the free serif everything reaches for, and it had started to
+   read as a default rather than as a choice. Zodiak keeps the serif-against-
+   mono counterpoint the layout is built on, but its contrast is harder and
+   its serifs are flat and cut, so the masthead reads severe instead of
+   bookish. It carries a true italic, which the hero's second line needs.
+
+   Switzer (same foundry, same licence) replaced Archivo for the same reason
+   on the body side. Note it has no width axis — see the body rule. */
 @font-face {
-  font-family: "EB Garamond Variable";
-  src: url("assets/fonts/garamond-var.woff2") format("woff2-variations");
-  font-weight: 400 800; font-style: normal; font-display: swap;
+  font-family: "Zodiak Variable";
+  src: url("assets/fonts/zodiak-var.woff2") format("woff2-variations");
+  font-weight: 100 900; font-style: normal; font-display: swap;
 }
 @font-face {
-  font-family: "EB Garamond Variable";
-  src: url("assets/fonts/garamond-var-italic.woff2") format("woff2-variations");
-  font-weight: 400 800; font-style: italic; font-display: swap;
+  font-family: "Zodiak Variable";
+  src: url("assets/fonts/zodiak-var-italic.woff2") format("woff2-variations");
+  font-weight: 100 900; font-style: italic; font-display: swap;
 }
 @font-face {
-  font-family: "Archivo Variable";
-  src: url("assets/fonts/archivo-var.woff2") format("woff2-variations");
-  font-weight: 100 900; font-stretch: 75% 100%; font-display: swap;
+  font-family: "Switzer Variable";
+  src: url("assets/fonts/switzer-var.woff2") format("woff2-variations");
+  font-weight: 100 900; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: "Switzer Variable";
+  src: url("assets/fonts/switzer-var-italic.woff2") format("woff2-variations");
+  font-weight: 100 900; font-style: italic; font-display: swap;
 }
 @font-face {
   font-family: "DM Mono";
@@ -53,8 +66,8 @@
      monochrome plus the single accent. */
 
   /* Type: display roman / grotesque UI / mono data */
-  --font-display: "EB Garamond Variable", ui-serif, Georgia, serif;
-  --font-body:    "Archivo Variable", ui-sans-serif, system-ui, "Segoe UI", sans-serif;
+  --font-display: "Zodiak Variable", ui-serif, Georgia, serif;
+  --font-body:    "Switzer Variable", ui-sans-serif, system-ui, "Segoe UI", sans-serif;
   --font-mono:    "DM Mono", ui-monospace, "SF Mono", Consolas, monospace;
 
   /* Scale */
@@ -132,7 +145,9 @@ body {
   background: var(--bg);
   color: var(--ink);
   font-family: var(--font-body);
-  font-variation-settings: "wdth" 88;
+  /* Archivo was set at wdth 88. Switzer has a weight axis only, so there is
+     no width to narrow — the measure is held by the max-width caps on the
+     text blocks instead, which is where it should have lived anyway. */
   font-size: var(--step-0);
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
@@ -325,12 +340,16 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .hero-name {
   margin: 0;
   font-family: var(--font-display);
-  font-size: clamp(3rem, 12.5vw, 11.5rem);
+  /* Sized down ~7% from the Garamond setting to hold the same cap height:
+     Zodiak's caps are 0.70em against Garamond's 0.65, and its x-height is
+     0.52 against 0.40, so a straight swap at the old size would have set the
+     masthead visibly larger and much heavier. */
+  font-size: clamp(2.8rem, 11.6vw, 10.7rem);
   font-weight: 500;
   letter-spacing: -0.025em;
   line-height: 0.88;
-  /* Garamond's italic descenders overflow a line box this tight — the boxes
-     don't collide but the ink does, so reserve depth for the tail of the "y". */
+  /* The italic descenders overflow a line box this tight — the boxes don't
+     collide but the ink does, so reserve depth for the tail of the "y". */
   padding-bottom: 0.14em;
   text-wrap: balance;
 }
@@ -393,6 +412,9 @@ button, a { -webkit-tap-highlight-color: transparent; }
    stacking a hairline and a diffuse blur (the detector's own named tell). */
 .task-window {
   position: relative; isolation: isolate;
+  /* The tiles come in three widths, so the title has to size against its own
+     tile rather than the viewport — see .tile-title. */
+  container-type: inline-size;
   display: block; overflow: hidden;
   min-height: 9.5rem; padding: 0;
   border-radius: var(--radius);
@@ -421,8 +443,21 @@ button, a { -webkit-tap-highlight-color: transparent; }
    photos into the same dark rectangle as the text-only tiles and flattened
    the hierarchy the 2x2 grid spans were trying to establish. One shared
    opacity — the old split between the two was arbitrary. */
-.tile-photo {
+/* The photo gets its own clipped frame instead of leaning on the tile's
+   overflow. The tile's rounded clip is rasterised once for the image layer and
+   again for the scrim stacked above it, and along the corner arcs those two
+   coverages disagree by a few percent — enough bright photo leaked through to
+   read as a stray white outline hooking around each bottom corner. A clip-path
+   one pixel inside the arc keeps the image off that edge entirely. It lives on
+   the frame rather than the image so the hover zoom scales inside the clip
+   instead of dragging it back out over the corner. */
+.tile-frame {
   position: absolute; inset: 0; z-index: -2;
+  display: block; overflow: hidden;
+  clip-path: inset(1px round var(--radius));
+}
+.tile-photo {
+  position: absolute; inset: 0;
   width: 100%; height: 100%;
   object-fit: cover; object-position: 50% 22%;
   opacity: 0.92;
@@ -432,10 +467,18 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .tile-photo--contain { object-position: 50% 12%; }
 .task-window:hover .tile-photo { transform: scale(1.04); filter: saturate(1.02) brightness(1); }
 /* Scrim confined to the lower band the text actually occupies, so the upper
-   two-thirds of the image stays clean. */
+   two-thirds of the image stays clean.
+
+   The bottom stop must be fully opaque and must match --bg. At 0.94 the last
+   6% of a bright photo leaked through along the clipped edge, and because the
+   tile's box lands on fractional pixels that leak concentrated into a light
+   hairline tracing the bottom edge and rounded corners — it read as a stray
+   white outline. Opaque, and matching the page underneath, leaves nothing to
+   show through and nothing to step against. */
 .task-window--feature .tile-body {
   background: linear-gradient(to top,
-    rgba(6, 5, 5, 0.94) 0%, rgba(6, 5, 5, 0.82) 32%, rgba(6, 5, 5, 0.24) 58%, transparent 78%);
+    rgb(10, 10, 10) 0%, rgba(10, 10, 10, 0.92) 22%, rgba(10, 10, 10, 0.78) 38%,
+    rgba(10, 10, 10, 0.24) 60%, transparent 80%);
 }
 
 .tile-body {
@@ -444,10 +487,21 @@ button, a { -webkit-tap-highlight-color: transparent; }
   height: 100%; min-height: inherit;
   padding: clamp(0.95rem, 2vw, 1.3rem);
 }
+/* Sized off the tile, not the window. A viewport-relative size gives every
+   tile the same 36px title, which the 350px feature tiles carry easily and
+   the 147px ones cannot — "Experience" is the longest word in the narrowest
+   tile, so it was the one that broke out and got clipped. The vw line is the
+   fallback for anything without container queries. */
 .tile-title {
   margin-top: auto;
   font-family: var(--font-display); font-weight: 500;
-  font-size: clamp(1.75rem, 2.8vw, 2.75rem); letter-spacing: -0.015em; line-height: 1;
+  letter-spacing: -0.015em; line-height: 1;
+  /* 12cqw, not 13: the tile's padding is a fixed ~41px, so the narrower the
+     tile the smaller the share of it the title can use. 12.9% is where the
+     tightest tile clips, measured. The floor is set low enough that it never
+     overrides the container calc before the cap does. */
+  font-size: clamp(1.15rem, 2vw, 2.25rem);
+  font-size: clamp(1.05rem, 12cqw, 2.25rem);
 }
 .tile-kicker { color: var(--ink-muted); font-size: var(--step--1); line-height: 1.4; }
 .tile-chips { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.15rem; }
@@ -475,11 +529,90 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .js .doc-source { display: none; }
 
 .doc-section {
+  position: relative;
   width: min(1180px, 100% - clamp(1.5rem, 6vw, 4rem));
   margin-inline: auto;
   padding-block: clamp(2rem, 5vh, 3rem);
 }
 .doc-source .doc-section + .doc-section { border-top: 1px solid var(--line); }
+
+/* The document marks. Same glyph medium as the shell's airframe, a step
+   quieter, because these sit behind reading matter instead of in open space.
+
+   Anchored to the outer edge of the header band — the lead is capped at 22ch,
+   so in Capabilities, Experience and Work that half of the band is genuinely
+   empty rather than borrowed. The masks are load-bearing, not decoration: the
+   horizontal one drops the ink to nothing before the text column, and the
+   vertical one clears the right-aligned kicker, which is the one line of copy
+   that does reach the far edge. They intersect, so a glyph has to clear both.
+
+   Only shown from the width where the documents go two-column and the band
+   opens up. Below that — and on phones especially — a decorative rasteriser
+   is a bad trade against battery on a tight stack. */
+.doc-field {
+  display: none;
+  position: absolute;
+  /* Starts below the header rule rather than at the top of the section. A
+     fade alone was not enough: the form still carried ink through the rule
+     and up into the kicker, which read as a collision rather than as depth.
+     Clearing the rule outright is the honest fix — the mark belongs to the
+     band under the header, not across it. */
+  top: 5.25rem; right: 0;
+  width: min(34rem, 58%);
+  /* Height, not width, is what sizes the form — the projection fits to the
+     shorter axis — so this one number decides how big every mark reads. Fixed
+     rather than viewport-relative: it has to stay inside the band reserved
+     below it, and a vh height would outgrow that band on a tall screen. */
+  height: 15rem;
+  z-index: 0;
+  pointer-events: none;
+  /* A soft top edge only. The first version masked away 55% of the width,
+     which halved a mark that was already too small — the mark has to be
+     readable first and discreet second, not the other way round. */
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 12%);
+          mask-image: linear-gradient(to bottom, transparent 0%, #000 12%);
+}
+
+/* Profile's header band is taken by the portrait, so its mark drops into the
+   same column underneath — photograph above, solid below, one column width.
+   No mask: this cell is its own empty space, not borrowed from text. */
+.doc-field--column {
+  position: static;
+  width: 100%;
+  height: 15rem;
+  -webkit-mask-image: none;
+          mask-image: none;
+}
+
+/* Contact closes on its mark instead of opening with one: its header band is
+   two columns of live text out to the right edge, but the section runs short
+   and leaves 300-odd px of empty window under it. Centred rather than pushed
+   right, so it reads as an end-mark and not as a misplaced corner one. */
+.doc-field--base {
+  position: static;
+  width: 100%;
+  height: 15rem;
+  margin-top: clamp(1.25rem, 3vh, 2.25rem);
+  -webkit-mask-image: none;
+          mask-image: none;
+}
+
+@media (min-width: 64em) {
+  .doc-field { display: block; }
+  .doc-field--column { grid-column: 2; margin-top: 0.5rem; }
+  /* Only the header-band marks need the band held open; the flow-placed ones
+     make their own room. */
+  .doc-section:has(> .doc-field--base) .doc-lead { min-block-size: 0; }
+
+  /* Hold the header band open for the mark. Without this the next block of
+     content starts ~130px down and cuts the form in half, which is what
+     forced the first version to be small enough to be unreadable. The lead
+     keeps its text at the top; the reserved height is the mark's room. */
+  .doc-section:has(> .doc-field) .doc-lead { min-block-size: 14.5rem; }
+}
+
+/* The reading matter sits above the mark, always. */
+.doc-head, .doc-lead { position: relative; z-index: 1; }
 
 .doc-head {
   display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between;
@@ -665,6 +798,14 @@ button, a { -webkit-tap-highlight-color: transparent; }
   scrollbar-width: none;
 }
 .rail::-webkit-scrollbar { display: none; }
+
+/* Mandatory snapping is right for a thumb — one card per swipe — but on a
+   trackpad it grabs at every frame of a free scroll, which reads as stutter.
+   Proximity lets the wheel run smoothly and still parks on a card at the end;
+   the arrows and dots scroll to exact stops either way, so they don't care. */
+@media (pointer: fine) {
+  .rail { scroll-snap-type: x proximity; }
+}
 
 .pcard {
   flex: 0 0 min(88%, 22rem);
@@ -1030,7 +1171,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 
 @media print {
   .site-header, .desktop-shell, .stage, .modal, .rail-nav, .skip-link,
-  .btn, .tile-cta { display: none !important; }
+  .doc-field, .btn, .tile-cta { display: none !important; }
   .js .doc-source { display: block !important; }
   body, .doc-source, .window-body { background: #fff !important; color: #000 !important; }
   .doc-source *, .window-body * { background: transparent !important; color: #000 !important; }
