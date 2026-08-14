@@ -505,10 +505,20 @@ html:not(.js) .lang-switch { display: none; }
    one pixel inside the arc keeps the image off that edge entirely. It lives on
    the frame rather than the image so the hover zoom scales inside the clip
    instead of dragging it back out over the corner. */
+/* The bottom inset is deliberately deeper than the rest. One pixel was enough
+   to hold the photo off the edge at rest, but not while the tile is moving:
+   hover translates the tile 3px and scales the photo at the same time, and the
+   photo — carrying its own opacity and its own transform — is composited as a
+   separate layer, so its clip is applied by the compositor rather than by the
+   painter that drew the tile. The tile's box lands on half pixels (913.5, and
+   414.83 tall), so mid-transition those two edges round differently and a
+   sliver of a very bright image flashes along the bottom. Three pixels is more
+   than that disagreement can ever be, and it costs nothing to look at because
+   the lower band of a feature tile is fully opaque scrim. */
 .tile-frame {
   position: absolute; inset: 0; z-index: -2;
   display: block; overflow: hidden;
-  clip-path: inset(1px round var(--radius));
+  clip-path: inset(1px 1px 3px round var(--radius));
 }
 .tile-photo {
   position: absolute; inset: 0;
