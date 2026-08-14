@@ -624,9 +624,11 @@ button, a { -webkit-tap-highlight-color: transparent; }
   border-bottom: 1px solid var(--line);
   background: transparent;
   text-decoration: none;
-  transition: color var(--dur) var(--ease), padding-left var(--dur) var(--ease);
+  /* transform, not padding — shifting padding on hover relayouts the row on
+     every pointer move. */
+  transition: color var(--dur) var(--ease), transform var(--dur) var(--ease);
 }
-.contact-list a:hover { color: var(--accent); padding-left: 1.5rem; }
+.contact-list a:hover { color: var(--accent); transform: translateX(0.4rem); }
 .contact-list a:hover .contact-label { color: var(--accent); }
 .contact-label {
   color: var(--ink-faint);
