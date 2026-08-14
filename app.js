@@ -414,7 +414,7 @@
 
     const grid = el("div", "cv-grid");
     CV_FILES.forEach((f) => {
-      const a = el("a", `cv-choice cv-choice--${f.code.toLowerCase()}`);
+      const a = el("a", "cv-choice");
       a.href = f.href;
       a.download = f.file;
       a.setAttribute("aria-label", `Download CV — ${f.name}`);

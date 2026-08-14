@@ -487,8 +487,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .doc-index { color: var(--accent); }
 .doc-kicker { color: var(--ink-faint); }
 
-/* The headline that used to eat the fold — now sized to sit above real content.
-   The trailing period is dropped: these are titles, not sentences. */
+/* The headline that used to eat the fold — now sized to sit above real content. */
 .doc-lead {
   max-width: 22ch;
   margin-bottom: 1rem;
@@ -825,7 +824,9 @@ button, a { -webkit-tap-highlight-color: transparent; }
 
 .modal {
   padding: 0; border-radius: var(--radius);
-  background: #0e0d0c; color: #f8f3e9;
+  /* Shell tokens, not one-off near-blacks — the modals belong to the dark
+     world and were drifting a few points off it. */
+  background: var(--bg); color: var(--ink);
   box-shadow: 0 46px 100px -30px rgba(0, 0, 0, 0.85);
   opacity: 0; transform: translateY(0.5rem) scale(0.99);
   transition: opacity 180ms var(--ease), transform 260ms var(--ease);
@@ -840,31 +841,38 @@ button, a { -webkit-tap-highlight-color: transparent; }
   border-bottom: 1px solid var(--line);
 }
 .modal-bar h2 {
-  font-size: var(--step--1); font-weight: 700;
-  letter-spacing: 0.12em; text-transform: uppercase; color: rgba(248, 243, 233, 0.75);
+  font-family: var(--font-mono); font-weight: 400;
+  font-size: var(--step--1);
+  letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent);
 }
 
 /* CV picker */
 .cv-modal { width: min(94vw, 30rem); }
 .cv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; padding: 1rem; }
+/* Two flat choices in the site's own language. The photographic flag fills
+   were the loudest thing on the page and belonged to no palette here; the
+   language is already named in the label, so the flag was decoration. */
 .cv-choice {
-  position: relative; isolation: isolate;
+  position: relative;
   display: grid; align-content: space-between; gap: 0.75rem;
-  min-height: 9rem; padding: 1rem; overflow: hidden;
-  border: 1px solid var(--line); border-radius: var(--radius-sm);
+  min-height: 8.5rem; padding: 1rem; overflow: hidden;
+  border: 1px solid var(--line-strong); border-radius: var(--radius-sm);
+  background: var(--surface);
   color: inherit; text-decoration: none;
-  transition: border-color var(--dur) var(--ease), transform var(--dur) var(--ease);
+  transition: border-color var(--dur) var(--ease), background var(--dur) var(--ease),
+              color var(--dur) var(--ease);
 }
-.cv-choice:hover { border-color: var(--accent); transform: translateY(-2px); }
-.cv-choice::before { content: ""; position: absolute; inset: 0; z-index: -2; opacity: 0.3; }
-.cv-choice::after {
-  content: ""; position: absolute; inset: 0; z-index: -1;
-  background: linear-gradient(150deg, rgba(14, 13, 12, 0.35), rgba(14, 13, 12, 0.85));
+.cv-choice:hover { border-color: var(--accent); background: var(--surface-hover); color: var(--accent); }
+.cv-code {
+  font-family: var(--font-display); font-weight: 500;
+  font-size: 3.2rem; line-height: 0.9; letter-spacing: -0.02em;
 }
-.cv-choice--en::before { background: url("assets/flag-uk.svg") center / cover no-repeat; }
-.cv-choice--pl::before { background: linear-gradient(180deg, #fff 0 50%, #dc143c 50% 100%); }
-.cv-code { font-size: 2.6rem; font-weight: 800; line-height: 1; }
-.cv-name { color: rgba(248, 243, 233, 0.75); font-size: var(--step--1); font-weight: 700; }
+.cv-name {
+  color: var(--ink-muted);
+  font-family: var(--font-mono); font-weight: 400;
+  font-size: var(--step--1); letter-spacing: 0.06em; text-transform: uppercase;
+}
+.cv-choice:hover .cv-name { color: var(--accent); }
 
 /* PDF reader */
 .pdf-modal { width: min(94vw, 64rem); height: min(90svh, 52rem); }
@@ -878,7 +886,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .pdf-stage {
   display: grid; place-items: center;
   min-height: 0; overflow: auto; padding: clamp(0.75rem, 2vw, 1.25rem);
-  background: radial-gradient(50rem 30rem at 50% 0%, rgba(185, 144, 73, 0.07), transparent 70%), #100f0e;
+  background: #101010;   /* one step off --bg so the page reads as a sheet on a table */
 }
 .pdf-stage img {
   max-width: 100%; max-height: 100%; object-fit: contain;
