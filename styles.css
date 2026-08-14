@@ -80,28 +80,35 @@
   --dur:  360ms;
 }
 
-/* Light document surface — applies wherever resume content is rendered,
-   both the no-JS fallback and inside the window overlay. */
+/* Document surface — wherever resume content is rendered, both the no-JS
+   fallback and inside the window overlay. One world: the same near-black as
+   the shell, lifted a single step so an open section reads as its own plane
+   rather than a hole in the page. Every value verified against #111111. */
 .doc-source,
 .window-body {
-  color-scheme: light;
-  --page:          #f1eee6;
-  --panel:         #fbf8f0;
-  --surface:       #fbf8f0;
-  --surface-hover: rgba(18, 17, 15, 0.055);  /* must override the dark-scope value */
-  --ink:         #12110f;   /* 16.3:1 */
-  --ink-muted:   #605b52;   /*  5.8:1 */
-  --ink-faint:   #5a666c;   /*  5.1:1 */
-  --line:        rgba(128, 113, 91, 0.26);
-  --line-strong: rgba(128, 113, 91, 0.5);
-  --accent:      #b8261d;   /*  5.4:1 */
-  --accent-ink:  #f8f3e9;   /* must override the dark-scope value: light text at 5.5:1 on this red, not the dark-scope's dark ink */
-  --gold:        #8a6a2f;   /*  4.7:1 */
-  --shadow-float: 0 24px 60px -24px rgba(60, 50, 35, 0.28);  /* the dark-scope shadows read as sooty smears on paper */
-  --shadow-lift:  0 12px 30px -18px rgba(60, 50, 35, 0.25);
+  color-scheme: dark;
+  --page:          #111111;
+  --panel:         #171717;
+  --surface:       #171717;
+  --surface-hover: #1f1f1f;
+  --ink:           #f2f2f2;   /* 16.9:1 */
+  --ink-muted:     #c7c7c7;   /* 11.2:1 — a step brighter than the shell's body
+                                 copy, because these are long reading passages
+                                 on a dark ground */
+  --ink-faint:     #8e8e8e;   /*  5.8:1 */
+  --line:          #232323;
+  --line-strong:   #383838;
+  --accent:        #fa4c14;   /*  5.5:1 — the shell's accent, unchanged */
+  --accent-ink:    #0a0a0a;   /*  5.8:1 on the accent */
+  --gold:          #d8a44a;
   background: var(--page);
   color: var(--ink);
 }
+/* Light text on a dark ground needs a touch more air to read at length. */
+.doc-source .body-text,
+.window-body .body-text,
+.doc-source .bullets,
+.window-body .bullets { line-height: 1.68; }
 
 /* 2. Base ================================================================== */
 
@@ -198,7 +205,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
    hero background fix above learned not to lean on near any text. */
 .btn kbd {
   padding: 0.1em 0.4em; border: 1px solid currentColor; border-radius: 0.3rem;
-  font: inherit; font-size: 0.8em; color: #605b52;
+  font: inherit; font-size: 0.8em; color: #a9a9a9;
 }
 
 /* Every label role runs mono, on both surfaces. The shell's connective tissue
@@ -685,7 +692,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 }
 .pcard-media--glyph::after {
   content: attr(data-glyph);
-  color: var(--line-strong);
+  color: #2e2e2e;
   font-family: var(--font-mono);
   font-size: clamp(2.5rem, 7vw, 3.75rem); font-weight: 400; letter-spacing: 0.12em;
 }
@@ -752,7 +759,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
   display: grid; grid-template-rows: auto minmax(0, 1fr);
   overflow: hidden;
   border-radius: var(--radius);
-  background: #f1eee6;
+  background: var(--page, #111111);
   box-shadow: 0 50px 110px -30px rgba(0, 0, 0, 0.75);
   opacity: 0;
   transition: left 480ms var(--ease), top 480ms var(--ease),
@@ -777,9 +784,9 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .window-toolbar {
   display: flex; align-items: center; gap: 1rem;
   min-height: 3.1rem; padding: 0 0.8rem;
-  border-bottom: 1px solid rgba(128, 113, 91, 0.26);
-  background: #fbf8f0;
-  color: #12110f;
+  border-bottom: 1px solid #232323;
+  background: #1b1b1b;
+  color: #f2f2f2;
 }
 /* Real window controls. Glyphs reveal on hover/focus of the group, so the
    buttons announce what they actually do instead of imitating it. */
@@ -805,13 +812,13 @@ button, a { -webkit-tap-highlight-color: transparent; }
    — they are the seam between the two worlds. */
 .window-title {
   margin-inline: auto;
-  color: #605b52;
+  color: #a9a9a9;
   font-family: var(--font-mono);
   font-size: var(--step--1); font-weight: 400;
   letter-spacing: 0.12em; text-transform: uppercase;
 }
-.window-close { border-color: rgba(128, 113, 91, 0.5); color: #12110f; }
-.window-close:hover { background: rgba(0, 0, 0, 0.05); border-color: #12110f; }
+.window-close { border-color: #383838; color: #f2f2f2; }
+.window-close:hover { background: #242424; border-color: #fa4c14; color: #fa4c14; }
 
 .window-body {
   overflow-y: auto;
@@ -849,30 +856,24 @@ button, a { -webkit-tap-highlight-color: transparent; }
 /* CV picker */
 .cv-modal { width: min(94vw, 30rem); }
 .cv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; padding: 1rem; }
-/* Two flat choices in the site's own language. The photographic flag fills
-   were the loudest thing on the page and belonged to no palette here; the
-   language is already named in the label, so the flag was decoration. */
 .cv-choice {
-  position: relative;
+  position: relative; isolation: isolate;
   display: grid; align-content: space-between; gap: 0.75rem;
-  min-height: 8.5rem; padding: 1rem; overflow: hidden;
-  border: 1px solid var(--line-strong); border-radius: var(--radius-sm);
-  background: var(--surface);
+  min-height: 9rem; padding: 1rem; overflow: hidden;
+  border: 1px solid var(--line); border-radius: var(--radius-sm);
   color: inherit; text-decoration: none;
-  transition: border-color var(--dur) var(--ease), background var(--dur) var(--ease),
-              color var(--dur) var(--ease);
+  transition: border-color var(--dur) var(--ease), transform var(--dur) var(--ease);
 }
-.cv-choice:hover { border-color: var(--accent); background: var(--surface-hover); color: var(--accent); }
-.cv-code {
-  font-family: var(--font-display); font-weight: 500;
-  font-size: 3.2rem; line-height: 0.9; letter-spacing: -0.02em;
+.cv-choice:hover { border-color: var(--accent); transform: translateY(-2px); }
+.cv-choice::before { content: ""; position: absolute; inset: 0; z-index: -2; opacity: 0.3; }
+.cv-choice::after {
+  content: ""; position: absolute; inset: 0; z-index: -1;
+  background: linear-gradient(150deg, rgba(14, 13, 12, 0.35), rgba(14, 13, 12, 0.85));
 }
-.cv-name {
-  color: var(--ink-muted);
-  font-family: var(--font-mono); font-weight: 400;
-  font-size: var(--step--1); letter-spacing: 0.06em; text-transform: uppercase;
-}
-.cv-choice:hover .cv-name { color: var(--accent); }
+.cv-choice--en::before { background: url("assets/flag-uk.svg") center / cover no-repeat; }
+.cv-choice--pl::before { background: linear-gradient(180deg, #fff 0 50%, #dc143c 50% 100%); }
+.cv-code { font-size: 2.6rem; font-weight: 800; line-height: 1; }
+.cv-name { color: rgba(248, 243, 233, 0.75); font-size: var(--step--1); font-weight: 700; }
 
 /* PDF reader */
 .pdf-modal { width: min(94vw, 64rem); height: min(90svh, 52rem); }
@@ -1031,7 +1032,8 @@ button, a { -webkit-tap-highlight-color: transparent; }
   .site-header, .desktop-shell, .stage, .modal, .rail-nav, .skip-link,
   .btn, .tile-cta { display: none !important; }
   .js .doc-source { display: block !important; }
-  body, .doc-source { background: #fff; color: #000; }
+  body, .doc-source, .window-body { background: #fff !important; color: #000 !important; }
+  .doc-source *, .window-body * { background: transparent !important; color: #000 !important; }
   .doc-section { width: 100%; padding: 0 0 1.5rem; page-break-inside: avoid; }
   .doc-lead { font-size: 1.4rem; }
   .rail { display: block; overflow: visible; }
