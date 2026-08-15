@@ -11,6 +11,7 @@
   const $  = (sel, scope = document) => scope.querySelector(sel);
   const $$ = (sel, scope = document) => [...scope.querySelectorAll(sel)];
   const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)");
+  const coarsePointer = matchMedia("(pointer: coarse)");
 
   const el = (tag, cls, text) => {
     const node = document.createElement(tag);
@@ -519,18 +520,40 @@
       return { show };
     }
 
-    addEventListener("pointermove", (e) => {
-      /* The document marks read the whole viewport. Mapping to their own box
-         would peg them at an extreme the moment the cursor crossed into the
-         text column, which is most of the time — the mark would sit frozen at
-         full deflection instead of tracking the hand. */
-      const r = o.track === "viewport"
-        ? { left: 0, top: 0, width: innerWidth, height: innerHeight }
-        : canvas.getBoundingClientRect();
-      pointer.tx = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width));
-      pointer.ty = Math.min(1, Math.max(0, (e.clientY - r.top) / r.height));
-      wake();
-    }, { passive: true });
+    if (coarsePointer.matches) {
+      /* A phone has no cursor, so scroll is what the model answers to: the
+         field turns as it travels up the screen, which is the same bargain the
+         cursor makes on a desktop — the reader's own movement drives it — and
+         it costs nothing, because there is no repaint when nothing is moving.
+
+         Captured rather than bubbled: a section reads inside the window
+         overlay, which scrolls its own body rather than the page, and scroll
+         events do not bubble. */
+      const fromScroll = () => {
+        const r = canvas.getBoundingClientRect();
+        const travel = innerHeight + r.height;
+        if (travel <= 0) return;
+        pointer.tx = Math.min(1, Math.max(0, 1 - (r.top + r.height) / travel));
+        pointer.ty = 0.5;
+        wake();
+      };
+      document.addEventListener("scroll", fromScroll, { passive: true, capture: true });
+      onLangChange(fromScroll);   // re-aim after a relayout
+      fromScroll();
+    } else {
+      addEventListener("pointermove", (e) => {
+        /* The document marks read the whole viewport. Mapping to their own box
+           would peg them at an extreme the moment the cursor crossed into the
+           text column, which is most of the time — the mark would sit frozen at
+           full deflection instead of tracking the hand. */
+        const r = o.track === "viewport"
+          ? { left: 0, top: 0, width: innerWidth, height: innerHeight }
+          : canvas.getBoundingClientRect();
+        pointer.tx = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width));
+        pointer.ty = Math.min(1, Math.max(0, (e.clientY - r.top) / r.height));
+        wake();
+      }, { passive: true });
+    }
 
     // Don't burn battery in a background tab or once it's scrolled away.
     document.addEventListener("visibilitychange", () => {
@@ -729,7 +752,19 @@
          cell size and full ink. */
       ox: 0.5, oy: 0.52, fit: 0.60, camz: 3.6, lens: 2.0,
       yaw: 3.4, yawBias: 0.6, pitch: 1.2, pitchBias: -0.1,
-      cell: 7,
+      /* Fixed at 7 where the mark sits in a header band. On a touch layout the
+         plate is set by its height, which is smaller — so the glyph size falls
+         back to the width rule and lands on 6, which buys resolution the form
+         needs at that size. Physical size is unchanged either way; only the
+         grain is. */
+      cell: coarsePointer.matches ? 0 : 7,
+      /* On a touch layout the mark is ground under the reading column, not
+         beside it, so its ink is set by the faintest text that will sit on top
+         of it. --ink-faint is 5.8:1 on the page; a glyph at full strength
+         lifts the local ground far enough to drop that under 3:1. At this
+         level the brightest glyph still leaves the faintest text above 4.5:1,
+         which is the floor for body copy — checked, not guessed. */
+      ink: coarsePointer.matches ? 0.26 : 1,
       amb: 0.40, range: 0.46,
       fogBias: 1.02, fogRate: 0.42, fogFloor: 0.30,
       track: "viewport",

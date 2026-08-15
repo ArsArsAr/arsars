@@ -95,7 +95,12 @@
   --radius-sm: 0.55rem;
   --gap:       clamp(0.75rem, 1.2vw, 1.15rem);
   --pad:       clamp(1.1rem, 3vw, 2.25rem);
-  --shell-w:   min(1520px, 100% - clamp(1.5rem, 5vw, 4rem));
+  /* The clamp is the total horizontal inset, so its floor is what a phone
+     gets: at 1.5rem that was 12px a side, and anything set flush right — a
+     kicker, a value in a spec row — sat almost on the edge while left-aligned
+     copy looked fine. 2.5rem gives 20px a side. The floor only binds below
+     about 660px, so wider layouts are untouched. */
+  --shell-w:   min(1520px, 100% - clamp(2.5rem, 5vw, 4rem));
 
   /* Elevation: shadow-only for floating surfaces (windows, cards, modals),
      border-only for flat/embossed surfaces (chips, contact rows). Never both
@@ -620,7 +625,9 @@ html[data-lang="pl"] .tile-title {
 
 .doc-section {
   position: relative;
-  width: min(1180px, 100% - clamp(1.5rem, 6vw, 4rem));
+  /* Same floor as --shell-w, for the same reason: right-aligned content in
+     these sections was landing 12px off the edge on a phone. */
+  width: min(1180px, 100% - clamp(2.5rem, 6vw, 4rem));
   margin-inline: auto;
   padding-block: clamp(2rem, 5vh, 3rem);
 }
@@ -685,6 +692,54 @@ html[data-lang="pl"] .tile-title {
   margin-top: clamp(1.25rem, 3vh, 2.25rem);
   -webkit-mask-image: none;
           mask-image: none;
+}
+
+/* Below the width where a header band has a spare half, the lead runs the full
+   measure and there is nowhere beside it for a mark to sit. So the mark stops
+   being an inset and becomes a full-width plate — which the markup already
+   gives for free: these canvases are the section's first child, so dropping the
+   absolute positioning lets them lead the section like a plate above a
+   headline. This covers tablets too, which fell in the gap between the phone
+   rules and the desktop ones and were getting no marks at all. */
+@media (max-width: 63.9375em) {
+  /* Everything the reader reads rides above the field. Stated once for the
+     section and for the two layouts that hold a mark inside them, rather than
+     per element, so nothing added later lands underneath by accident. */
+  .doc-section > *,
+  .profile-layout > *,
+  .contact-layout > * { position: relative; z-index: 1; }
+  /* ...but the layout wrappers themselves must not become containing blocks,
+     or the mark they hold anchors to the wrapper instead of to the section and
+     starts partway down the page. Their children still take z-index: they are
+     grid items, which are stacking-aware without being positioned. */
+  .profile-layout, .contact-layout { position: static; }
+
+  /* The mark becomes ground rather than an object in the column: anchored to
+     the top of the section, running the full measure, with the content over
+     it — the same relationship the airframe has with the masthead.
+
+     Absolute inside .doc-section resolves against the section for all three
+     variants, including Profile's, which sits inside .profile-layout — so one
+     rule places every mark without touching the markup. */
+  .doc-field,
+  .doc-field--column,
+  .doc-field--base {
+    display: block;
+    position: absolute;
+    /* Width must be stated, and stated as a percentage. The desktop rule caps
+       it at 58% of the section, so it has to be overridden — but `auto` is the
+       wrong override here: a canvas is a replaced element, so auto resolves to
+       its intrinsic width, which is the backing store the renderer sizes to
+       cssWidth x dpr. On a 2x phone that fed 704px straight back into layout
+       and the field sized itself from its own buffer. */
+    top: 0; left: 0; bottom: auto;
+    width: 100%; height: 22rem;
+    margin: 0;
+    z-index: 0;
+    /* Falls away before the section's body copy begins. */
+    -webkit-mask-image: linear-gradient(to bottom, #000 55%, transparent 92%);
+            mask-image: linear-gradient(to bottom, #000 55%, transparent 92%);
+  }
 }
 
 @media (min-width: 64em) {
@@ -987,7 +1042,16 @@ html[data-lang="pl"] .tile-title {
   position: absolute;
   left: var(--from-x, 50vw); top: var(--from-y, 50vh);
   width: var(--from-w, 12rem); height: var(--from-h, 12rem);
-  display: grid; grid-template-rows: auto minmax(0, 1fr);
+  /* minmax(0, 1fr) on the column as well as the rows. An implicit auto track is
+     floored at its content's min-content width, so on a narrow screen one wide
+     child pushed the track past the window's own width and the whole reader
+     ended up wider than the phone — every section inside it measured 383px in a
+     375px viewport. Allowing the track to shrink below min-content puts the
+     column back on the container, and anything genuinely too wide (the project
+     rail) scrolls within itself as intended. */
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr);
   overflow: hidden;
   border-radius: var(--radius);
   background: var(--page, #111111);
@@ -1141,8 +1205,24 @@ html[data-lang="pl"] .tile-title {
 
 /* Mobile: the tile grid was sitting entirely off-screen with no cue that it
    existed. Tighten the hero's own rhythm and add a scroll affordance. */
+/* --- Phones ---------------------------------------------------------------
+   The glyph work is the site's signature and it was switched off entirely
+   below 48em, which left the phone as a plain document with none of the
+   character the desktop trades on. It is back, and it earns its place: the
+   fields only repaint while something is moving, and on a phone the thing
+   that moves is the scroll — see app.js, where scroll drives the model in
+   place of a cursor. Nothing runs while the reader is still. */
 @media (max-width: 47.9375em) {
   .task-view { gap: 1.5rem; padding-top: 1.75rem; padding-bottom: 1.25rem; }
+
+  /* The airframe keeps to the masthead band rather than the whole shell, so
+     it stays a signature over the name instead of a texture behind the page. */
+  .glyph-field {
+    display: block;
+    inset: 0 0 auto; height: 24rem;
+  }
+
+  /* The airframe keeps to the masthead band, see below. */
   .hero-location { margin-top: 0.35rem; }
   .hero-role { margin-top: 0.4rem; }
   .hero-summary { margin-top: 0.85rem; font-size: var(--step-0); }
@@ -1164,6 +1244,34 @@ html[data-lang="pl"] .tile-title {
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(0.25rem); }
   }
+
+  /* Hierarchy, restored. Stacking the bento put every tile at one width, and
+     because height then came from content alone the two tiles carrying photos
+     ended up shorter than the text-only one — the strongest content given the
+     least room, which is the ranking exactly inverted. Photos get a real band
+     to read in; the rest stay compact so the column is a rhythm rather than
+     five equal slabs. */
+  /* Base first, modifier second: both are single-class selectors, so the one
+     written later wins and a generic rule placed below the feature rule
+     silently undoes it. */
+  .task-window { min-height: 8.5rem; }
+  .task-window--feature { min-height: 15rem; }
+  .task-window--feature .tile-photo { object-position: 50% 18%; }
+
+  /* The header holds one row, not two. It was 102px of an 812px screen — an
+     eighth of the viewport, sticky, for a language switch and a button — and
+     that was because the two controls had no room beside each other and
+     wrapped. Given the full width they sit on one line.
+
+     No nav strip here: the tiles already are the section index, they are one
+     screen away, and a duplicate list is not worth 44px of permanently sticky
+     viewport on a phone. */
+  .site-header {
+    grid-template-columns: 1fr auto;
+    gap: 0.6rem;
+    min-height: 0;
+  }
+  .header-actions { flex-wrap: nowrap; justify-content: flex-end; }
 }
 @media (min-width: 48em) { .scroll-cue { display: none; } }
 
@@ -1240,6 +1348,9 @@ html[data-lang="pl"] .tile-title {
   .btn, .btn--sm, .nav-link { min-height: 2.75rem; }
   .hero-links a { display: inline-flex; align-items: center; min-height: 2.75rem; }
   .rail-arrow { width: 2.75rem; height: 2.75rem; }
+  /* Added after this block existed, so it never picked up the floor: the two
+     language buttons were 39x36. */
+  .lang-btn { min-height: 2.75rem; padding-inline: 0.85rem; }
   .rail-dot { height: 2.75rem; padding-block: 1.225rem; background-clip: content-box; }
   .traffic { gap: 0; }
   .traffic-btn { width: 2.75rem; height: 2.75rem; padding: 0.975rem; background-clip: content-box; }
