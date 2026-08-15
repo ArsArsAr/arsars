@@ -583,6 +583,16 @@ html:not(.js) .lang-switch { display: none; }
   font-size: clamp(1.15rem, 2vw, 2.25rem);
   font-size: clamp(1.05rem, 12cqw, 2.25rem);
 }
+/* Polish needs its own calibration: "Doświadczenie" is thirteen characters
+   where "Experience" is ten, and it sets wider per character besides — 7.5px
+   of width per pixel of font size against 5.6. At the English factor it ran
+   23px out of the narrowest tile. Sized per language rather than lowering the
+   factor globally, which would shrink English titles to make room for a word
+   they never have to render. The floor drops with it, or it would override the
+   container calc at narrow widths and put the overflow straight back. */
+html[data-lang="pl"] .tile-title {
+  font-size: clamp(0.8rem, 9cqw, 2.25rem);
+}
 .tile-kicker { color: var(--ink-muted); font-size: var(--step--1); line-height: 1.4; }
 .tile-chips { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.15rem; }
 .chip {
