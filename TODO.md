@@ -124,6 +124,33 @@ chip. Touch has no window chrome to imitate, and phones have no Esc key.
   `data-pl-*`, so it announces in English on a Polish page.
 - `content: "Loading page"` is hardcoded in CSS where `t()` cannot reach it.
 
+## Done since the critique, found by other means
+
+### ~~`.stage-window` animated left/top/width/height~~ — done
+Flagged by a design-taste skill's performance guardrails (never animate anything but
+`transform`/`opacity`), independently of the original critique — though the critique's own
+detector had already caught the same thing under a different name (`layout-transition`).
+Every open/close/switch ran full layout on ~30 frames of a 480ms transition, across
+whichever section was mounted.
+
+Rewritten as a FLIP transform: `.stage-window` is now always laid out at its real final
+size (fullscreen, or the windowed inset), and what used to be the animated box geometry is
+a `translate() scale()` that starts the window looking like it's still sitting at the tile,
+computed fresh at open/switch/close time from `stageWindow.getBoundingClientRect()` (the
+box's own live "final" size) against the origin tile's rect. `border-radius` stays a real
+transitioned property — scaling a `border-radius:0` box down doesn't make its corners round
+again — which costs a repaint but never a layout, so it doesn't reintroduce what this change
+removes. The `is-windowed` maximize toggle was deliberately left alone: it only ever applies
+once the shared zoom transform has already settled to `none`, so it can't interact with the
+rewrite, and touching a secondary, low-frequency toggle wasn't worth the added risk here.
+
+One real bug caught only by testing, not by inspection: `setZoomOrigin` originally ran
+*before* `stage.hidden` was cleared, so it measured the box while a `display:none` ancestor
+still collapsed it to zero size — every scale ratio came out `Infinity`. Reordering fixed it.
+Verified afterward to the pixel: starting transform matches the tile's geometry exactly,
+the settled state matches the viewport exactly, and closing after a switch retracts into
+the section actually showing, not the one that first opened the window.
+
 ## Housekeeping
 
 - Dead code: `.pcard-media--glyph` and its `::after`, `data-window-link`, `--gold`,

@@ -1181,6 +1181,25 @@
   const docSource    = $("#content");
   const shell        = $(".desktop-shell");
 
+  /* The zoom illusion in one place: stageWindow is always laid out at its real
+     size (see styles.css), so its own current getBoundingClientRect() IS the
+     "final" size regardless of when this runs — before, during, or between
+     animations. Only the transform used to reach that size from a given rect
+     changes, which is what these two functions compute. */
+  const setZoomOrigin = (rect) => {
+    const final = stageWindow.getBoundingClientRect();
+    stageWindow.style.setProperty("--from-x", `${rect.left}px`);
+    stageWindow.style.setProperty("--from-y", `${rect.top}px`);
+    stageWindow.style.setProperty("--from-sx", `${rect.width / final.width}`);
+    stageWindow.style.setProperty("--from-sy", `${rect.height / final.height}`);
+  };
+  const clearZoomOrigin = () => {
+    stageWindow.style.removeProperty("--from-x");
+    stageWindow.style.removeProperty("--from-y");
+    stageWindow.style.removeProperty("--from-sx");
+    stageWindow.style.removeProperty("--from-sy");
+  };
+
   const sections = new Map();
   $$(".doc-section", docSource).forEach((section) => {
     const anchor = document.createComment(`section:${section.id}`);
@@ -1237,20 +1256,21 @@
       // close button's focus-return at a control that is about to be
       // retracted along with everything else. Only a fresh open updates it.
       lastTrigger = trigger || lastTrigger;
-
-      // Zoom the window out of the tile that was clicked.
       const origin = trigger?.getBoundingClientRect();
-      if (origin && !reduceMotion.matches) {
-        stageWindow.style.setProperty("--from-x", `${origin.left}px`);
-        stageWindow.style.setProperty("--from-y", `${origin.top}px`);
-        stageWindow.style.setProperty("--from-w", `${origin.width}px`);
-        stageWindow.style.setProperty("--from-h", `${origin.height}px`);
-      } else {
-        stageWindow.style.removeProperty("--from-x");
-        stageWindow.style.removeProperty("--from-y");
-        stageWindow.style.removeProperty("--from-w");
-        stageWindow.style.removeProperty("--from-h");
-      }
+
+      /* stage.hidden must come off before setZoomOrigin, not after: the box's
+         "final" size in that helper is read from stageWindow's own live
+         layout, and a display:none ancestor (.stage[hidden]) lays it out at
+         0x0 — every scale ratio came out Infinity the one time this ran in
+         the other order. Nothing paints in between: getBoundingClientRect()
+         forces layout, not paint, so unhiding a frame "early" here doesn't
+         flash anything the browser wouldn't have shown anyway. */
+      stage.hidden = false;
+      document.body.classList.add("is-locked");
+      setBackgroundInert(true);
+
+      if (origin && !reduceMotion.matches) setZoomOrigin(origin);
+      else clearZoomOrigin();
     }
 
     windowTitle.textContent = sectionTitle(id);
@@ -1267,10 +1287,6 @@
       // animation has run.
       windowBody.focus({ preventScroll: true });
     } else {
-      stage.hidden = false;
-      document.body.classList.add("is-locked");
-      setBackgroundInert(true);
-
       // One frame so the browser records the origin geometry before it animates.
       requestAnimationFrame(() => {
         stage.classList.add("is-open");
@@ -1300,12 +1316,7 @@
        is the state the tile will be sitting in once the window is gone. */
     const tile = $(`[data-window="${id}"]`);
     const home = tile && !reduceMotion.matches ? tile.getBoundingClientRect() : null;
-    if (home && home.width && home.height) {
-      stageWindow.style.setProperty("--from-x", `${home.left}px`);
-      stageWindow.style.setProperty("--from-y", `${home.top}px`);
-      stageWindow.style.setProperty("--from-w", `${home.width}px`);
-      stageWindow.style.setProperty("--from-h", `${home.height}px`);
-    }
+    if (home && home.width && home.height) setZoomOrigin(home);
 
     stage.classList.remove("is-open");
 

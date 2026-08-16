@@ -1055,16 +1055,34 @@ html[data-lang="pl"] .tile-title {
 .stage.is-open .stage-backdrop { background: rgba(0, 0, 0, 0.55); backdrop-filter: blur(14px); }
 
 .stage-window {
-  position: absolute;
-  left: var(--from-x, 50vw); top: var(--from-y, 50vh);
-  width: var(--from-w, 12rem); height: var(--from-h, 12rem);
-  /* minmax(0, 1fr) on the column as well as the rows. An implicit auto track is
-     floored at its content's min-content width, so on a narrow screen one wide
-     child pushed the track past the window's own width and the whole reader
-     ended up wider than the phone — every section inside it measured 383px in a
-     375px viewport. Allowing the track to shrink below min-content puts the
-     column back on the container, and anything genuinely too wide (the project
-     rail) scrolls within itself as intended. */
+  /* The box is always laid out at its real, final size — fullscreen, or the
+     windowed inset below — never at the tile's size. What used to animate
+     left/top/width/height (triggering full layout on every one of ~30 frames,
+     across whichever section is currently mounted) is now a single transform
+     that starts the window looking like it's still sitting at the tile: only
+     paint and composite move, layout never runs during the animation at all.
+     transform-origin: 0 0 so scale shrinks toward the box's own top-left,
+     which is what makes `translate(originX, originY) scale(ratio)` land the
+     scaled box's corner exactly on the tile's corner — the standard FLIP
+     technique for zooming between two elements of different size.
+
+     border-radius stays a real transitioned property rather than folded into
+     the transform: scaling a border-radius:0 box down does not make its
+     corners round again, it only makes already-sharp corners smaller.
+     Animating it costs a repaint, not a layout — it never touches document
+     flow the way the box-model properties above it did, so it doesn't bring
+     back the cost this change removes.
+
+     minmax(0, 1fr) on both axes: an implicit auto track is floored at its
+     content's min-content size, so on a narrow screen one wide child once
+     pushed the track past the window's own width and every section measured
+     wider than the viewport that held it. Letting the track shrink below
+     min-content puts both axes back on the container; anything genuinely too
+     wide (the project rail) scrolls within itself as intended. */
+  position: absolute; inset: 0;
+  transform-origin: 0 0;
+  transform: translate(var(--from-x, 0px), var(--from-y, 0px))
+             scale(var(--from-sx, 1), var(--from-sy, 1));
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
   grid-template-columns: minmax(0, 1fr);
@@ -1078,28 +1096,27 @@ html[data-lang="pl"] .tile-title {
      the window was invisible a fifth of the way into a 480ms retraction, so it
      read as vanishing rather than as going back where it came from. Held
      opaque while it shrinks, it lands on its tile and only then lets go. */
-  transition: left 480ms var(--ease), top 480ms var(--ease),
-              width 480ms var(--ease), height 480ms var(--ease),
-              border-radius 480ms var(--ease),
+  transition: transform 480ms var(--ease), border-radius 480ms var(--ease),
               opacity 160ms var(--ease) 300ms;
 }
 .stage.is-open .stage-window {
-  left: 0; top: 0; width: 100vw; height: 100svh;
+  transform: none;
   border-radius: 0; opacity: 1;
   /* Opening keeps the fade at the front, where it belongs: the window is
      already solid a fifth of the way out of the tile and the eye follows the
      growth, not the reveal. */
-  transition: left 480ms var(--ease), top 480ms var(--ease),
-              width 480ms var(--ease), height 480ms var(--ease),
-              border-radius 480ms var(--ease),
+  transition: transform 480ms var(--ease), border-radius 480ms var(--ease),
               opacity 200ms var(--ease) 0s;
 }
-/* Green control: a genuine windowed mode, so "zoom" means something.
-   Inset rather than translated, so the open animation still runs from the tile. */
+/* Green control: a genuine windowed mode, so "zoom" means something. This
+   stays its own real left/top/width/height transition — it only ever applies
+   once .is-open has already settled the shared zoom transform to `none`, so
+   the two never run against each other, and it is a deliberate, secondary,
+   low-frequency toggle rather than the animation that fires on every open. */
 .stage.is-open .stage-window.is-windowed {
   --inset-x: clamp(1rem, 5vw, 5rem);
   --inset-y: clamp(1rem, 5vh, 3.5rem);
-  left: var(--inset-x); top: var(--inset-y);
+  left: var(--inset-x); top: var(--inset-y); right: auto; bottom: auto;
   width: calc(100vw - 2 * var(--inset-x));
   height: calc(100svh - 2 * var(--inset-y));
   border-radius: var(--radius);
