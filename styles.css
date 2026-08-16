@@ -496,6 +496,13 @@ html:not(.js) .lang-switch { display: none; }
   transform: translateY(-3px);
   box-shadow: var(--shadow-float);
 }
+/* The tiles are the whole site's primary navigation — five of them, the most
+   clicked things on the page — and had a hover lift but nothing on press.
+   Settling below the hover peak, not just back to rest, is what reads as a
+   push rather than a flicker. transform is already transitioned above, so
+   this rides the same var(--dur) the rest of the tile's motion uses rather
+   than a one-off faster timing that would feel like a different system. */
+.task-window:active { transform: translateY(-1px) scale(0.985); }
 
 /* Imagery is what separates a feature tile from a standard one, so it has to
    actually read. Previously 0.72/0.58 behind a heavy scrim, which muted both
