@@ -564,7 +564,37 @@
             <button class="traffic-btn traffic-btn--zoom" type="button" data-glyph="⤡"
                     data-window-action="zoom" title="Exit full screen" aria-label="Exit full screen"></button>
           </div>
+
+          <!-- The section a window is showing used to be a dead end: reaching
+               a different one meant closing back to the overview and opening
+               it fresh. These links swap the window's content in place — they
+               are real hash links, so the existing document-level click
+               handler and history wiring pick them up with no new JS path.
+               #windowTitle stays as the dialog's accessible name (kept in
+               sync by the same code that already updated it) and becomes the
+               visible label only where this nav is hidden — see styles.css. -->
+          <nav class="window-nav" id="windowNav" data-i18n aria-label="Sections" data-pl-aria-label="Sekcje">
+            <a class="nav-link" href="#profile"><span lang="en">Profile</span><span lang="pl">Profil</span></a>
+            <a class="nav-link" href="#capabilities"><span lang="en">Capabilities</span><span lang="pl">Kompetencje</span></a>
+            <a class="nav-link" href="#experience"><span lang="en">Experience</span><span lang="pl">Doświadczenie</span></a>
+            <a class="nav-link" href="#work"><span lang="en">Work</span><span lang="pl">Projekty</span></a>
+            <a class="nav-link" href="#contact"><span lang="en">Contact</span><span lang="pl">Kontakt</span></a>
+          </nav>
           <p class="window-title" id="windowTitle">Window</p>
+
+          <!-- Language was unreachable while a window was open: the header
+               sits behind the window (z-index 80 vs 40) and is made inert for
+               real, not just visually covered, so a second control has to
+               live somewhere actually on top. Same markup, same data
+               attributes as the header's switch — the existing setLang()
+               already updates every [data-lang-set] node it finds, so this
+               one is wired up for free. -->
+          <div class="lang-switch window-lang-switch" role="group" data-i18n
+               aria-label="Language" data-pl-aria-label="Język">
+            <button class="lang-btn" type="button" data-lang-set="en" aria-pressed="true">EN</button>
+            <button class="lang-btn" type="button" data-lang-set="pl" aria-pressed="false">PL</button>
+          </div>
+
           <button class="btn btn--sm window-close" type="button" data-close-window>
             <span lang="en">Overview</span><span lang="pl">Przegląd</span>
             <kbd>Esc</kbd>

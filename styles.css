@@ -1134,6 +1134,39 @@ html[data-lang="pl"] .tile-title {
   font-size: var(--step--1); font-weight: 400;
   letter-spacing: 0.12em; text-transform: uppercase;
 }
+
+/* The section nav takes over as the visible title from 48em, where the
+   toolbar has room for it — narrower than the header nav's own 64em, because
+   the toolbar spans the full window width with nothing else competing for it,
+   where the header shares its row with the CV button and language switch.
+   Below 48em the plain title remains exactly as it always was; nothing here
+   changes that case. */
+.window-nav {
+  display: none;
+  flex: 1 1 auto; min-width: 0;
+  justify-content: center; align-items: center;
+  gap: 0.1rem;
+  overflow-x: auto; scrollbar-width: none;
+}
+.window-nav::-webkit-scrollbar { display: none; }
+.window-nav .nav-link { min-height: 0; padding-block: 0.35rem; white-space: nowrap; }
+
+.window-lang-switch { display: none; flex: none; }
+
+@media (min-width: 48em) {
+  .window-nav { display: flex; }
+  .window-lang-switch { display: inline-flex; }
+  /* #windowTitle stays mounted for aria-labelledby — the dialog's accessible
+     name — but the nav is now the visible label, so the text duplicate is
+     taken out of the flow the same way .sr-only does, not hidden outright:
+     display:none content is unreliable as a labelledby target in some
+     screen-reader/browser pairings, where an off-screen clip is not. */
+  .window-title {
+    position: absolute; width: 1px; height: 1px;
+    padding: 0; margin: -1px; overflow: hidden;
+    clip-path: inset(50%); white-space: nowrap;
+  }
+}
 .window-close { border-color: #383838; color: #f2f2f2; }
 .window-close:hover { background: #242424; border-color: #fa4c14; color: #fa4c14; }
 

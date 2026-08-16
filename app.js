@@ -1191,8 +1191,20 @@
   const FOCUSABLE =
     'a[href], button:not([disabled]), input, select, textarea, [tabindex]:not([tabindex="-1"])';
 
+  const sectionTitle = (id) => {
+    const entry = sections.get(id);
+    return (lang === "pl" && entry.node.dataset.titlePl) || entry.node.dataset.title || id;
+  };
+
   let current = null;
   let lastTrigger = null;
+
+  /* windowTitle is the dialog's accessible name (see aria-labelledby on
+     .stage-window) and, below 48em, its visible label too — so it has to
+     track a language switch made while a window is open. Before the switch
+     lived in the toolbar it couldn't be reached mid-read, which is the only
+     reason a stale title here was never noticed. */
+  onLangChange(() => { if (current) windowTitle.textContent = sectionTitle(current); });
 
   const setBackgroundInert = (on) => {
     [header, shell, docSource].forEach((node) => {
@@ -1208,44 +1220,63 @@
     const entry = sections.get(id);
     if (!entry || current === id) return;
 
+    /* A window already on screen just gets new content — no retraction, no
+       re-opening choreography. The whole reason the window used to be a dead
+       end is that reaching a different section had no path except back out to
+       the overview and in again; this is that path. */
+    const isSwitch = current !== null;
+
     // Return whatever is currently mounted before mounting the next one.
     if (current) sections.get(current).anchor.after(sections.get(current).node);
 
-    lastTrigger = trigger || lastTrigger;
     current = id;
 
-    // Zoom the window out of the tile that was clicked.
-    const origin = trigger?.getBoundingClientRect();
-    if (origin && !reduceMotion.matches) {
-      stageWindow.style.setProperty("--from-x", `${origin.left}px`);
-      stageWindow.style.setProperty("--from-y", `${origin.top}px`);
-      stageWindow.style.setProperty("--from-w", `${origin.width}px`);
-      stageWindow.style.setProperty("--from-h", `${origin.height}px`);
-    } else {
-      stageWindow.style.removeProperty("--from-x");
-      stageWindow.style.removeProperty("--from-y");
-      stageWindow.style.removeProperty("--from-w");
-      stageWindow.style.removeProperty("--from-h");
+    if (!isSwitch) {
+      // A switch has nowhere to zoom from — the window is already full size —
+      // and letting lastTrigger track an in-toolbar link would point the
+      // close button's focus-return at a control that is about to be
+      // retracted along with everything else. Only a fresh open updates it.
+      lastTrigger = trigger || lastTrigger;
+
+      // Zoom the window out of the tile that was clicked.
+      const origin = trigger?.getBoundingClientRect();
+      if (origin && !reduceMotion.matches) {
+        stageWindow.style.setProperty("--from-x", `${origin.left}px`);
+        stageWindow.style.setProperty("--from-y", `${origin.top}px`);
+        stageWindow.style.setProperty("--from-w", `${origin.width}px`);
+        stageWindow.style.setProperty("--from-h", `${origin.height}px`);
+      } else {
+        stageWindow.style.removeProperty("--from-x");
+        stageWindow.style.removeProperty("--from-y");
+        stageWindow.style.removeProperty("--from-w");
+        stageWindow.style.removeProperty("--from-h");
+      }
     }
 
-    windowTitle.textContent =
-      (lang === "pl" && entry.node.dataset.titlePl) || entry.node.dataset.title || id;
+    windowTitle.textContent = sectionTitle(id);
     windowBody.replaceChildren(entry.node);
     windowBody.scrollTop = 0;
-
-    stage.hidden = false;
-    document.body.classList.add("is-locked");
-    setBackgroundInert(true);
 
     // Rail state must not depend on the animation frame — the section is
     // measurable as soon as it is mounted and visible.
     if (id === "work") syncRail();
 
-    // One frame so the browser records the origin geometry before it animates.
-    requestAnimationFrame(() => {
-      stage.classList.add("is-open");
+    if (isSwitch) {
+      // Content already has a stage to sit in; just move focus and the
+      // reading position onto it, the way the fresh-open path does once its
+      // animation has run.
       windowBody.focus({ preventScroll: true });
-    });
+    } else {
+      stage.hidden = false;
+      document.body.classList.add("is-locked");
+      setBackgroundInert(true);
+
+      // One frame so the browser records the origin geometry before it animates.
+      requestAnimationFrame(() => {
+        stage.classList.add("is-open");
+        windowBody.focus({ preventScroll: true });
+      });
+    }
 
     $$(".nav-link").forEach((link) =>
       link.setAttribute("aria-current", String(link.hash === `#${id}`))
@@ -1365,7 +1396,17 @@
 
     e.preventDefault();
     if (location.hash === link.hash) { routeTo(id, link); return; }
-    history.pushState({ win: id }, "", link.hash);
+    /* A switch between two open sections replaces the current history entry
+       instead of stacking a new one. Push-per-switch was tried first and
+       broke Close: requestClose() undoes exactly one history entry, so after
+       two or three switches, clicking the traffic-light close or the
+       Overview button only stepped back through the reading trail instead of
+       actually closing — the button stopped meaning what it says. Replacing
+       keeps the stack at one window-entry deep no matter how many sections
+       were visited, so Close, Esc and browser Back all agree on what
+       "leave" means: straight back to the overview. */
+    if (current) history.replaceState({ win: id }, "", link.hash);
+    else history.pushState({ win: id }, "", link.hash);
     routeTo(id, link);
   });
 

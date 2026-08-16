@@ -14,23 +14,34 @@ Re-run `/impeccable critique` after fixes to see the number move.
 
 ## P1 — fix before this is shown to anyone who matters
 
-### The section window is a one-way door
-Opening a section sets `inert` + `aria-hidden` on the header, shell and doc source, so
-the nav, the EN/PL switch and the CV button are all dead while reading. There is no
-cross-section control inside the window, and below 1024px there is no header nav at all.
-Reading all five sections costs five open/close cycles and eight 480ms animations. A
-Polish speaker who lands on the English page and opens Profile cannot switch language
-without backing out.
+### ~~The section window is a one-way door~~ — done
+The toolbar now carries the five section names as real `<a href="#id">` links
+(`#windowNav`, ≥48em — narrower than the header nav's own 64em gate, since the toolbar
+has the full window width to itself) plus a second language switch (`.window-lang-switch`,
+reusing the header's exact markup and `data-lang-set` wiring, so no new JS was needed to
+keep them in sync). `openWindow` now distinguishes a fresh open from a switch between two
+already-open sections: a switch skips the retraction/zoom choreography entirely and just
+swaps content, moves focus to it, and updates the title.
 
-- Put the five section names in `.window-toolbar` as mono links.
-- Swap sections in place: `windowBody.replaceChildren(next)` + update title +
-  `history.pushState`, **without** retracting the window. `openWindow` already returns
-  the previous section to its anchor (`app.js`), so the swap logic exists — it needs a
-  trigger that is not a full close.
-- Move the language switch into the toolbar, or lift it out of the `inert` scope.
-- **Dependency:** `windowTitle.textContent` is set only inside `openWindow` and is never
-  registered with `onLangChange`, so it goes stale on a language switch. Currently
-  invisible only because the switch is unreachable. Fix it as part of this.
+`#windowTitle` stays mounted for `aria-labelledby` (the dialog's accessible name) and
+becomes the visually-hidden one below 48em, where the plain title text is unchanged from
+before — the CSS reuses the `.sr-only` clip pattern rather than `display:none`, since the
+sr-only element still needs to work as an aria-labelledby target when it isn't display:none.
+
+Fixed the same run:
+- **Window title going stale on a language switch** — was set once inside `openWindow`
+  and never registered with `onLangChange`, invisible only because the switch was
+  unreachable. Now updates live via a shared `sectionTitle(id)` helper.
+- **A real regression caught by testing, not assumed away:** switching sections pushed a
+  new history entry each time, so `requestClose()` — which the traffic-light close, the
+  minimize button and the big Overview button all call — only undid one switch instead of
+  actually closing, after two or three section switches. A switch now `replaceState`s the
+  current entry instead of pushing, so Close/Esc/Overview/browser-Back all agree on what
+  "leave" means regardless of how many sections were visited first.
+- Verified: retracting after a switch zooms into the *current* section's tile, not the one
+  that originally opened the window; focus order through the new toolbar controls is
+  traffic → nav links → lang switch → Overview, all inside the existing Tab trap
+  unmodified; no console errors across open → switch → language-switch → close.
 
 ### ~~Two of five projects are dead ends~~ — done
 Both diagrams are now `DOCS` entries (`pages: 1`) with a "View the diagram" / "Zobacz
