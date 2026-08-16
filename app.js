@@ -48,7 +48,10 @@
       original:  "Original PDF", pageOf: (a, b) => `Page ${a} of ${b}`,
       full: "Enter full screen", exitFull: "Exit full screen",
       railView:  (i, n) => `Projects, view ${i} of ${n}`,
-      ashtea:    "Product & Market Analysis Project",
+      ashtea:      "Product & Market Analysis Project",
+      modelAgency: "Model Agency Database System",
+      umlBpmn:     "UML System Design Projects",
+      originalImage: "Full-size image",
     },
     pl: {
       docTitle:  "Arsenij Arsiriy — student zarządzania informacją | CV i projekty",
@@ -59,7 +62,10 @@
       original:  "Oryginalny PDF", pageOf: (a, b) => `Strona ${a} z ${b}`,
       full: "Tryb pełnoekranowy", exitFull: "Wyjdź z trybu pełnoekranowego",
       railView:  (i, n) => `Projekty, widok ${i} z ${n}`,
-      ashtea:    "Projekt analizy produktu i rynku",
+      ashtea:      "Projekt analizy produktu i rynku",
+      modelAgency: "System bazodanowy agencji modelek",
+      umlBpmn:     "Projekty projektowania systemów w UML",
+      originalImage: "Pełny obraz",
     },
   };
 
@@ -893,12 +899,32 @@
 
   /* --- PDF reader --------------------------------------------------------- */
 
+  /* A document is a page pattern plus a count. A single-page document needs no
+     {n} in the pattern — replace() simply finds nothing to substitute — so the
+     two diagrams reuse the reader wholesale rather than needing a viewer of
+     their own. sourceKey names what the "original" link actually opens, since
+     for these it is an image and not a PDF. */
   const DOCS = {
     ashtea: {
       key: "ashtea",
       pattern: "assets/ashtea-pages-webp/page-{n}.webp",
       pages: 15,
-      source: "assets/ashtea-marketing-project.pdf"
+      source: "assets/ashtea-marketing-project.pdf",
+      sourceKey: "original"
+    },
+    modelAgency: {
+      key: "modelAgency",
+      pattern: "assets/model-agency-erd.webp",
+      pages: 1,
+      source: "assets/model-agency-erd.webp",
+      sourceKey: "originalImage"
+    },
+    umlBpmn: {
+      key: "umlBpmn",
+      pattern: "assets/uml-bpmn-preview.webp",
+      pages: 1,
+      source: "assets/uml-bpmn-preview.webp",
+      sourceKey: "originalImage"
     }
   };
 
@@ -929,12 +955,17 @@
     onLangChange(() => {
       pdfPrev.setAttribute("aria-label", t("prevPage"));
       pdfNext.setAttribute("aria-label", t("nextPage"));
-      source.textContent = t("original");
+      source.textContent = t(pdfState.doc?.sourceKey || "original");
       closeBtn.textContent = t("close");
       // The heading holds a document's own title while one is open, and the
       // generic word only when nothing is loaded yet.
-      if (!pdfState.doc) pdfTitle.textContent = t("document");
-      else pdfTitle.textContent = t(pdfState.doc.key);
+      if (!pdfState.doc) { pdfTitle.textContent = t("document"); return; }
+      pdfTitle.textContent = t(pdfState.doc.key);
+      // The alt carries the document's name, so it is language-dependent too.
+      pdfImg.alt = pdfState.doc.pages > 1
+        ? `${t(pdfState.doc.key)} — ${t("pageOf", pdfState.page, pdfState.doc.pages)}`
+        : t(pdfState.doc.key);
+      pdfCount.setAttribute("aria-label", t("pageOf", pdfState.page, pdfState.doc.pages));
     });
 
     const controls = el("div", "pdf-controls");
@@ -966,10 +997,17 @@
     const stage = pdfImg.parentElement;
     stage.dataset.loading = "true";
     pdfImg.src = pdfSrc(doc, pdfState.page);
-    pdfImg.alt = `${doc.title} — page ${pdfState.page} of ${doc.pages}`;
+    /* doc.title has not existed since the reader was translated; this read
+       "undefined — page 1 of 15" to every screen reader, in both languages. */
+    pdfImg.alt = doc.pages > 1
+      ? `${t(doc.key)} — ${t("pageOf", pdfState.page, doc.pages)}`
+      : t(doc.key);
     const clear = () => { stage.dataset.loading = "false"; };
     pdfImg.decode ? pdfImg.decode().then(clear, clear) : pdfImg.addEventListener("load", clear, { once: true });
 
+    // Two permanently disabled arrows and a "1 / 1" counter are noise, not state.
+    const paged = doc.pages > 1;
+    [pdfPrev, pdfNext, pdfCount].forEach((n) => n.hidden = !paged);
     pdfCount.textContent = `${pdfState.page} / ${doc.pages}`;
     pdfCount.setAttribute("aria-label", t("pageOf", pdfState.page, doc.pages));
     pdfPrev.disabled = pdfState.page <= 1;
@@ -994,6 +1032,7 @@
     pdfState.doc = doc;
     pdfTitle.textContent = t(doc.key);
     pdf._source.href = doc.source;
+    pdf._source.textContent = t(doc.sourceKey || "original");
     showPage(1);
     pdf.open();
   });

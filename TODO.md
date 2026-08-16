@@ -32,16 +32,16 @@ without backing out.
   registered with `onLangChange`, so it goes stale on a language switch. Currently
   invisible only because the switch is unreachable. Fix it as part of this.
 
-### Two of five projects are dead ends
-Cards 3 (*Model Agency Database System*) and 4 (*UML System Design Projects*) have no CTA
-where cards 1, 2 and 5 do. They carry the most technical copy on the site and are exactly
-what the Work tile's "databases, analysis" promises. A `.pcard` with no button contains
-nothing focusable, so keyboard order runs card 1 → 2 → 5 and never reaches them.
+### ~~Two of five projects are dead ends~~ — done
+Both diagrams are now `DOCS` entries (`pages: 1`) with a "View the diagram" / "Zobacz
+diagram" button. The reader hides its arrows and page counter on a single-page document,
+and "Original PDF" relabels to "Full-size image" / "Pełny obraz" for the two that are
+images rather than PDFs. Verified: every card now has a focusable CTA, the alt text and
+title track a language switch made mid-read.
 
-- Both images already ship: `assets/model-agency-erd.webp`, `assets/uml-bpmn-preview.webp`.
-- Add them to `DOCS` as single-page documents and give each card a
-  "View the diagram" / "Zobacz diagram" button.
-- Fixes the broken promise, the keyboard skip and the card inconsistency in one move.
+Found and fixed along the way: `.rail-arrow` sets its own `display: grid`, which beats
+the `[hidden]` UA rule — setting `.hidden = true` on the PDF reader's arrows did nothing
+visually until `.rail-arrow[hidden] { display: none }` was added.
 
 ---
 
@@ -55,10 +55,9 @@ contrast reads where low-alpha screen glyphs do not.
 Options: fewer and larger cells; more contrast inside the mark's own band while keeping
 text clear of it; or simpler silhouettes that survive the medium.
 
-### `alt="undefined"` and no error path in the PDF reader
-- `app.js` builds the page alt from `doc.title`, but `DOCS.ashtea` defines `key`. A screen
-  reader announces "undefined" on all 15 pages, in both languages. Use `t(doc.key)` and
-  `t("pageOf", …)` — both already exist and are already translated.
+### ~~`alt="undefined"`~~ — done; no error path in the PDF reader still open
+`pdfImg.alt` now builds from `t(doc.key)` and `t("pageOf", …)`, both already translated,
+and updates live if the language changes while a document is open. Still open:
 - No `onerror` on any image anywhere; a failed page clears the busy state and shows a
   broken icon.
 - No timeout on `stage.dataset.loading`, so a decode that never settles leaves the reader

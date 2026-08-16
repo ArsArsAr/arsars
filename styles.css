@@ -1007,6 +1007,10 @@ html[data-lang="pl"] .tile-title {
 .pcard-body .btn { margin-top: auto; }
 
 .rail-nav { display: flex; align-items: center; gap: 0.75rem; }
+/* [hidden] loses to any class selector that sets display, .rail-arrow among
+   them — the PDF reader hides its arrows and counter on a single-page
+   document by setting .hidden, and without this they stayed on screen. */
+.rail-arrow[hidden] { display: none; }
 .rail-arrow {
   display: grid; place-items: center; flex: none;
   width: 2.5rem; height: 2.5rem;
