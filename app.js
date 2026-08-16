@@ -323,15 +323,29 @@
     let raf = 0, running = false, live = false, sized = false;
 
     const resize = () => {
-      const r = canvas.getBoundingClientRect();
+      /* clientWidth/clientHeight, not getBoundingClientRect(): the section a
+         canvas lives in sits inside .stage-window, which now reaches its open
+         size via a transform (see the FLIP rewrite in styles.css) rather than
+         by animating its own box. getBoundingClientRect() reports the on-
+         screen painted quad through that whole transform chain, so a canvas
+         measured while the ancestor's zoom is still mid-flight reads as
+         whatever fraction of full size the transform happened to be at that
+         instant — and because the backing store this sets is only ever redone
+         when ResizeObserver reports a real LAYOUT change, and the layout size
+         here never changes between opens (only the paint used to), a bad
+         reading taken once during the animation stays wrong on every reopen.
+         clientWidth/clientHeight are the element's own intrinsic box size and
+         are never affected by an ancestor's transform, which is exactly why
+         isVisible() below already uses clientWidth rather than this. */
+      const w = canvas.clientWidth, h = canvas.clientHeight;
       state.dpr = Math.min(devicePixelRatio || 1, 2);
-      state.w = r.width; state.h = r.height;
-      canvas.width = Math.round(r.width * state.dpr);
-      canvas.height = Math.round(r.height * state.dpr);
+      state.w = w; state.h = h;
+      canvas.width = Math.round(w * state.dpr);
+      canvas.height = Math.round(h * state.dpr);
       ctx.setTransform(state.dpr, 0, 0, state.dpr, 0, 0);
-      state.cell = o.cell || (r.width > 1500 ? 8 : r.width > 1000 ? 7 : 6);
-      state.cols = Math.ceil(r.width / state.cell);
-      state.rows = Math.ceil(r.height / (state.cell * 1.06));
+      state.cell = o.cell || (w > 1500 ? 8 : w > 1000 ? 7 : 6);
+      state.cols = Math.ceil(w / state.cell);
+      state.rows = Math.ceil(h / (state.cell * 1.06));
       const n = state.cols * state.rows;
       depth = new Float32Array(n);
       shade = new Float32Array(n);
