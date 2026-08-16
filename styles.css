@@ -814,7 +814,12 @@ html[data-lang="pl"] .tile-title {
   border-top: 1px solid var(--line-strong);
 }
 .fact { padding: 0.9rem 1rem 0 0; }
-.fact + .fact { padding-left: 1rem; border-left: 1px solid var(--line); }
+/* The rule marks a column boundary, so which items carry one depends on how
+   many columns there are — not on which items happen to follow each other in
+   the source. `.fact + .fact` is adjacency, and at two columns it indented the
+   third item, which is the one that starts the second row and should sit flush
+   with the first. Two columns: only the item in the right-hand column. */
+.fact:nth-child(2n) { padding-left: 1rem; border-left: 1px solid var(--line); }
 .fact dt {
   color: var(--accent);
   font-family: var(--font-mono);
@@ -1281,7 +1286,10 @@ html[data-lang="pl"] .tile-title {
   .task-window--feature { min-height: 15rem; }
   .task-window--wide { grid-column: span 2; }
 
+  /* Four columns: every item but the first sits against a boundary. Adds the
+     third, which the two-column rule deliberately skips. */
   .fact-row { grid-template-columns: repeat(4, 1fr); }
+  .fact:nth-child(n + 2) { padding-left: 1rem; border-left: 1px solid var(--line); }
   .panel-grid { grid-template-columns: repeat(2, 1fr); }
   .timeline-item { grid-template-columns: 10rem minmax(0, 1fr); }
   .contact-layout { grid-template-columns: minmax(0, 1fr) minmax(18rem, 0.85fr); }
