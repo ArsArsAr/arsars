@@ -12,6 +12,12 @@
   const $$ = (sel, scope = document) => [...scope.querySelectorAll(sel)];
   const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)");
   const coarsePointer = matchMedia("(pointer: coarse)");
+  /* The width at which a glyph field stops sitting beside the reading column
+     and starts sitting under it. Both the layout (styles.css) and the ink
+     below are governed by this one query — they were previously split across
+     width and pointer type, so a mouse user in a narrow window got the
+     under-the-text layout at over-the-empty-space ink. */
+  const textOverField = matchMedia("(max-width: 63.9375em)");
 
   const el = (tag, cls, text) => {
     const node = document.createElement(tag);
@@ -455,8 +461,14 @@
           // Accent is reserved for the propeller disc. Keying it off shading
           // instead painted whole wing panels orange, because a flat surface
           // shares one normal and clears any brightness threshold at once.
+          /* The accent follows the same shading curve as everything else, and
+             is capped below it. A flat 0.5 made the propeller the loudest
+             thing in the composition — brighter than the aircraft it belongs
+             to, and at some angles reading as a stray orange streak across the
+             masthead rather than as a spinning disc. It is a detail of the
+             model, so it is lit like one. */
           ctx.fillStyle = isProp[idx]
-            ? `rgba(250, 76, 20, ${0.5 * fog * o.ink})`
+            ? `rgba(250, 76, 20, ${(0.08 + s * 0.22) * fog * o.ink})`
             : `rgba(242, 242, 242, ${(0.10 + s * 0.30) * fog * o.ink})`;
           ctx.fillText(RAMP[gi], xq * cell + cell / 2, yq * chStep + chStep / 2);
         }
@@ -566,7 +578,15 @@
       }, { threshold: 0 }).observe(canvas);
     } else { live = true; show(); wake(); }
 
-    return { show };
+    // Tuning that depends on a media query has to be changeable, or the field
+    // keeps whatever the viewport happened to be at load.
+    const retune = (patch) => {
+      Object.assign(o, patch);
+      if ("cell" in patch) sized = false;
+      show();
+    };
+
+    return { show, retune };
   };
 
   /* --- Document solids ---------------------------------------------------- */
@@ -736,13 +756,27 @@
     dish:      { pitchBias: 0.75, yawBias: -2.20 },    // mouth of the dish, from above
   };
 
-  makeGlyphField($("#glyphField"), buildAirframe, { idle: 1, spin: 9.0 });
+  /* Ink that keeps the faintest text above 4.5:1 over the brightest glyph the
+     renderer can paint. 0.22, not the 0.26 used before: that figure was
+     checked against --ink-faint but not against --accent, which is the real
+     worst case on both grounds — .doc-index and .hero-role are accent, and at
+     0.26 they land at 4.40:1 on --page. Verified per surface, per token. */
+  const FIELD_INK = 0.22;
+  const fieldTune = (under) => ({ ink: under ? FIELD_INK : 1 });
 
+  /* The airframe was hidden on phones precisely because "the hero is a tight
+     stack the aircraft would sit directly behind" — see styles.css. Showing it
+     there is right, but it inherits that reason: wherever the hero stacks over
+     the field, the field has to give way. */
+  const hero = makeGlyphField($("#glyphField"), buildAirframe,
+    { idle: 1, spin: 9.0, ...fieldTune(textOverField.matches) });
+
+  const marks = [];
   $$("[data-solid]").forEach((canvas) => {
     const name = canvas.dataset.solid;
     const build = SOLIDS[name];
     if (!build) return;
-    makeGlyphField(canvas, build, {
+    const field = makeGlyphField(canvas, build, {
       /* Framed like the airframe, not like an icon. The first pass squeezed
          these into the gap beside the lead, which capped them at ~20 cells of
          7px type at partial ink — at that size the glyph shapes stop being
@@ -757,20 +791,30 @@
          back to the width rule and lands on 6, which buys resolution the form
          needs at that size. Physical size is unchanged either way; only the
          grain is. */
-      cell: coarsePointer.matches ? 0 : 7,
-      /* On a touch layout the mark is ground under the reading column, not
-         beside it, so its ink is set by the faintest text that will sit on top
-         of it. --ink-faint is 5.8:1 on the page; a glyph at full strength
-         lifts the local ground far enough to drop that under 3:1. At this
-         level the brightest glyph still leaves the faintest text above 4.5:1,
-         which is the floor for body copy — checked, not guessed. */
-      ink: coarsePointer.matches ? 0.26 : 1,
+      /* Fixed at 7 where the mark sits in a header band. Where it becomes a
+         plate its height sets the size, which is smaller — so the glyph size
+         falls back to the width rule and lands on 6, buying the resolution the
+         form needs. Physical size is unchanged either way; only the grain is. */
+      cell: textOverField.matches ? 0 : 7,
       amb: 0.40, range: 0.46,
       fogBias: 1.02, fogRate: 0.42, fogFloor: 0.30,
       track: "viewport",
+      ...fieldTune(textOverField.matches),
       ...SOLID_VIEW[name],
     });
+    if (field) marks.push(field);
   });
+
+  /* Re-tune when the query flips: a field built in one layout keeps that
+     layout's ink and grain otherwise, so dragging a window across the
+     breakpoint would leave full-strength glyphs under the text. */
+  const onLayoutChange = () => {
+    const under = textOverField.matches;
+    hero?.retune(fieldTune(under));
+    marks.forEach((m) => m.retune({ ...fieldTune(under), cell: under ? 0 : 7 }));
+  };
+  if (textOverField.addEventListener) textOverField.addEventListener("change", onLayoutChange);
+  else textOverField.addListener(onLayoutChange);
 
   /* --- Dialog helper ------------------------------------------------------ */
   /* Native <dialog> gives us the top layer, ::backdrop and Esc for free; we
@@ -1172,11 +1216,28 @@
   const closeWindow = () => {
     if (!current) return;
     const entry = sections.get(current);
+    const id = current;
     current = null;
 
-    stage.classList.remove("is-open");
     document.body.classList.remove("is-locked");
     setBackgroundInert(false);
+
+    /* Retract into the tile this section belongs to, measured now rather than
+       reusing the origin captured on open. The window can be opened from the
+       nav, from a hero link, or straight from a URL — none of which is the
+       tile — and the shell may have been resized meanwhile. Measured after the
+       scroll lock is released, so the geometry matches the page at rest, which
+       is the state the tile will be sitting in once the window is gone. */
+    const tile = $(`[data-window="${id}"]`);
+    const home = tile && !reduceMotion.matches ? tile.getBoundingClientRect() : null;
+    if (home && home.width && home.height) {
+      stageWindow.style.setProperty("--from-x", `${home.left}px`);
+      stageWindow.style.setProperty("--from-y", `${home.top}px`);
+      stageWindow.style.setProperty("--from-w", `${home.width}px`);
+      stageWindow.style.setProperty("--from-h", `${home.height}px`);
+    }
+
+    stage.classList.remove("is-open");
 
     const finish = () => {
       entry.anchor.after(entry.node);   // put the section back in the document

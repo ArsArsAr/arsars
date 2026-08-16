@@ -1062,13 +1062,26 @@ html[data-lang="pl"] .tile-title {
   background: var(--page, #111111);
   box-shadow: 0 50px 110px -30px rgba(0, 0, 0, 0.75);
   opacity: 0;
+  /* This rule's timings drive the CLOSING direction, and the fade has to come
+     last or it hides the very thing it is closing on: at 200ms with no delay
+     the window was invisible a fifth of the way into a 480ms retraction, so it
+     read as vanishing rather than as going back where it came from. Held
+     opaque while it shrinks, it lands on its tile and only then lets go. */
   transition: left 480ms var(--ease), top 480ms var(--ease),
               width 480ms var(--ease), height 480ms var(--ease),
-              border-radius 480ms var(--ease), opacity 200ms var(--ease);
+              border-radius 480ms var(--ease),
+              opacity 160ms var(--ease) 300ms;
 }
 .stage.is-open .stage-window {
   left: 0; top: 0; width: 100vw; height: 100svh;
   border-radius: 0; opacity: 1;
+  /* Opening keeps the fade at the front, where it belongs: the window is
+     already solid a fifth of the way out of the tile and the eye follows the
+     growth, not the reveal. */
+  transition: left 480ms var(--ease), top 480ms var(--ease),
+              width 480ms var(--ease), height 480ms var(--ease),
+              border-radius 480ms var(--ease),
+              opacity 200ms var(--ease) 0s;
 }
 /* Green control: a genuine windowed mode, so "zoom" means something.
    Inset rather than translated, so the open animation still runs from the tile. */
