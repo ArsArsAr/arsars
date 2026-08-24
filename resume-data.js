@@ -13,7 +13,7 @@ window.resumeData = {
     { label: "Focus", value: "IT & business systems" },
     { label: "Education", value: "PJATK, 2024-2027" },
     { label: "Experience", value: "Operations & freight" },
-    { label: "Languages", value: "Ukrainian, Russian, Polish, English" }
+    { label: "Languages", value: "Polish, English, Russian, Ukrainian" }
   ],
   experience: [
     {
@@ -92,7 +92,7 @@ window.resumeData = {
     },
     {
       group: "Languages",
-      items: ["Ukrainian - Native", "Russian - Native", "Polish - Native", "English - C1, IELTS 8.0"]
+      items: ["Polish - Native", "English - C1, IELTS 8.0", "Russian - Native", "Ukrainian - Native"]
     },
     {
       group: "Additional",

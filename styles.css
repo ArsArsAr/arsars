@@ -1157,6 +1157,14 @@ html[data-lang="pl"] .tile-title {
    — they are the seam between the two worlds. */
 .window-title {
   margin-inline: auto;
+  /* Below 48em this sits between the fixed-width traffic lights and the
+     Overview button as the only flexible thing in the row — without a way to
+     shrink, a long title (Capabilities, Doświadczenie) held the row open
+     past the button's own width and pushed it off a phone screen instead of
+     giving up space. Truncating is fine here since the section is already
+     open; the title is just a reminder of where you are. */
+  min-width: 0; max-width: 100%;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
   color: #a9a9a9;
   font-family: var(--font-mono);
   font-size: var(--step--1); font-weight: 400;
