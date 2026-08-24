@@ -56,6 +56,19 @@
   font-family: "DM Mono";
   src: url("assets/fonts/dm-mono.woff2") format("woff2");
   font-weight: 400; font-style: normal; font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215;
+}
+/* The base file above has no Polish diacritics (Ą Ę Ć Ł Ń Ś Ź Ż) — without a
+   unicode-range split the browser can't tell, so it silently swaps the whole
+   run to a fallback system font the moment one of those letters shows up.
+   This second face carries just that range, so only the one glyph borrows a
+   different font instead of the entire word — see the mismatched-size Ę/Ą in
+   the mono chrome (hero role, buttons) this was fixing. */
+@font-face {
+  font-family: "DM Mono";
+  src: url("assets/fonts/dm-mono-latin-ext.woff2") format("woff2");
+  font-weight: 400; font-style: normal; font-display: swap;
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
 
 :root {
@@ -455,6 +468,7 @@ html:not(.js) .lang-switch { display: none; }
   font-size: var(--step--1); letter-spacing: 0.06em; text-transform: uppercase;
 }
 .hero-links a {
+  display: inline-flex; align-items: center; gap: 0.4rem;
   color: var(--ink-faint); text-decoration: none;
   border-bottom: 1px solid var(--line-strong); padding-bottom: 0.15rem;
   transition: color var(--dur) var(--ease), border-color var(--dur) var(--ease);
@@ -927,6 +941,7 @@ html[data-lang="pl"] .tile-title {
 .contact-list a:hover { color: var(--accent); transform: translateX(0.4rem); }
 .contact-list a:hover .contact-label { color: var(--accent); }
 .contact-label {
+  display: inline-flex; align-items: center; gap: 0.4rem;
   color: var(--ink-faint);
   font-family: var(--font-mono);
   font-size: var(--step--1); font-weight: 400;
@@ -994,17 +1009,6 @@ html[data-lang="pl"] .tile-title {
   font-family: var(--font-mono);
   font-size: clamp(2.5rem, 7vw, 3.75rem); font-weight: 400; letter-spacing: 0.12em;
 }
-/* Badge picks up the shell's accent chip treatment rather than a neutral
-   translucent pill. */
-.pcard-badge {
-  position: absolute; top: 0.7rem; left: 0.7rem;
-  padding: 0.28rem 0.62rem; border-radius: 999px;
-  background: var(--accent); color: var(--accent-ink);
-  font-family: var(--font-mono);
-  font-size: 0.72rem; font-weight: 400;
-  letter-spacing: 0.07em; text-transform: uppercase;
-}
-
 .pcard-body {
   display: flex; flex-direction: column; align-items: flex-start; gap: 0.7rem;
   padding: clamp(0.95rem, 2vw, 1.25rem);
@@ -1217,7 +1221,16 @@ html[data-lang="pl"] .tile-title {
 .modal.is-open::backdrop { background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(8px); }
 
 .modal-bar {
-  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  display: flex; align-items: center; justify-content: space-between; gap: 0.5rem 1rem;
+  /* flex-wrap, not nowrap: on the PDF reader this row holds a title plus a
+     four-control cluster (prev/count/next/source) plus close, and even at
+     each item's own minimum width the three don't fit one line on a phone.
+     Without wrap the row simply overflowed sideways instead of shrinking.
+     min-width: 0 additionally stops it holding the dialog open to that same
+     width as a grid item — content-based minimum size is the default when
+     overflow is visible. */
+  flex-wrap: wrap;
+  min-width: 0;
   padding: 0.85rem 1rem;
   border-bottom: 1px solid var(--line);
 }
@@ -1251,7 +1264,11 @@ html[data-lang="pl"] .tile-title {
 
 /* PDF reader */
 .pdf-modal { width: min(94vw, 64rem); height: min(90svh, 52rem); }
-.pdf-panel { display: grid; grid-template-rows: auto minmax(0, 1fr); height: 100%; }
+/* grid-template-columns is explicit, not left to default to a single auto
+   column — an auto column sizes to its widest child's max-content, which for
+   a long title plus the full prev/count/next/source cluster is wider than a
+   phone screen, so the whole dialog scrolled sideways instead of wrapping. */
+.pdf-panel { display: grid; grid-template-rows: auto minmax(0, 1fr); grid-template-columns: minmax(0, 1fr); height: 100%; }
 .pdf-controls { display: flex; align-items: center; gap: 0.5rem; }
 .pdf-count {
   min-width: 4rem; text-align: center;
@@ -1279,6 +1296,54 @@ html[data-lang="pl"] .tile-title {
   letter-spacing: 0.1em; text-transform: uppercase;
 }
 .pdf-stage { position: relative; }
+
+/* Database project viewer. Same shell size as the PDF reader, but the stage
+   swaps between a centred image (Diagram) and a scrolling column of prose
+   and code blocks (Schema / Queries / Triggers) instead of paging. */
+.db-modal { width: min(94vw, 64rem); height: min(90svh, 52rem); }
+.db-panel { display: grid; grid-template-rows: auto auto minmax(0, 1fr); grid-template-columns: minmax(0, 1fr); height: 100%; }
+.db-tabs {
+  display: flex; gap: 0.4rem; flex-wrap: wrap;
+  padding: 0.75rem 1rem; border-bottom: 1px solid var(--line);
+}
+.db-tab {
+  border: 1px solid var(--line-strong); border-radius: 999px;
+  padding: 0.4rem 0.9rem; background: transparent; color: var(--ink-faint);
+  font-family: var(--font-mono); font-size: var(--step--1); letter-spacing: 0.06em; text-transform: uppercase;
+  cursor: pointer;
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+.db-tab:hover { color: var(--ink); border-color: var(--ink); }
+.db-tab[aria-selected="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+
+.db-stage { min-height: 0; overflow: auto; background: #101010; }
+.db-stage[data-tab="diagram"] { display: grid; place-items: center; padding: clamp(0.75rem, 2vw, 1.25rem); }
+.db-stage[data-tab="diagram"] img {
+  max-width: 100%; max-height: 100%; object-fit: contain;
+  box-shadow: 0 18px 44px -18px rgba(0, 0, 0, 0.8);
+}
+
+.db-content { padding: 1.25rem clamp(1rem, 3vw, 2rem) 2rem; display: grid; gap: 1.5rem; align-content: start; }
+.db-intro { margin: 0; max-width: 60ch; color: var(--ink-muted); line-height: 1.6; }
+.db-entities { margin: 0; display: grid; gap: 0.3rem 0; }
+.db-entities dt { font-family: var(--font-mono); font-size: var(--step--1); color: var(--accent); letter-spacing: 0.02em; }
+.db-entities dd { margin: 0 0 0.7rem; max-width: 60ch; color: var(--ink-muted); line-height: 1.5; }
+.db-questions { margin: 0; padding-left: 1.1rem; max-width: 60ch; color: var(--ink-muted); line-height: 1.6; display: grid; gap: 0.35rem; }
+
+.db-block { display: grid; gap: 0.6rem; }
+.db-block-title {
+  margin: 0; font-family: var(--font-mono); font-size: var(--step--1);
+  font-weight: 400; letter-spacing: 0.02em; color: var(--ink);
+}
+.db-code {
+  margin: 0; padding: 1rem; overflow-x: auto;
+  border: 1px solid var(--line); border-radius: var(--radius-sm);
+  background: #131313;
+}
+.db-code code {
+  font-family: var(--font-mono); font-size: 0.8rem; line-height: 1.55;
+  color: var(--ink-muted); white-space: pre;
+}
 
 /* 10. Breakpoints ========================================================== */
 

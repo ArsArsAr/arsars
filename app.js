@@ -52,6 +52,9 @@
       modelAgency: "Model Agency Database System",
       umlBpmn:     "UML System Design Projects",
       originalImage: "Full-size image",
+      dbTabDiagram: "Diagram", dbTabSchema: "Schema", dbTabQueries: "Queries", dbTabTriggers: "Triggers",
+      dbEntitiesHeading: "Entities", dbQuestionsHeading: "What this schema answers",
+      modelAgencyDiagramAlt: "Entity relationship diagram for a model agency database, with Model, Agent, Casting, Campaign, Contract and Payment entities",
     },
     pl: {
       docTitle:  "Arsenij Arsiriy — student zarządzania informacją | CV i projekty",
@@ -66,6 +69,9 @@
       modelAgency: "System bazodanowy agencji modelek",
       umlBpmn:     "Projekty projektowania systemów w UML",
       originalImage: "Pełny obraz",
+      dbTabDiagram: "Diagram", dbTabSchema: "Schemat", dbTabQueries: "Zapytania", dbTabTriggers: "Wyzwalacze",
+      dbEntitiesHeading: "Encje", dbQuestionsHeading: "Na jakie pytania odpowiada ten schemat",
+      modelAgencyDiagramAlt: "Diagram związków encji dla bazy danych agencji modelek, z encjami Modelka, Agent, Casting, Kampania, Umowa i Płatność",
     },
   };
 
@@ -926,13 +932,6 @@
       source: "assets/ashtea-marketing-project.pdf",
       sourceKey: "original"
     },
-    modelAgency: {
-      key: "modelAgency",
-      pattern: "assets/model-agency-erd.webp",
-      pages: 1,
-      source: "assets/model-agency-erd.webp",
-      sourceKey: "originalImage"
-    },
     umlBpmn: {
       key: "umlBpmn",
       pattern: "assets/uml-bpmn-preview.webp",
@@ -1049,6 +1048,695 @@
     pdf._source.textContent = t(doc.sourceKey || "original");
     showPage(1);
     pdf.open();
+  });
+
+  /* --- Database project viewer --------------------------------------------- */
+
+  /* The schema, queries and triggers behind the Model Agency card are real
+     SQL, not scanned pages, so they get a tabbed reader instead of being
+     forced through the PDF pager: each stays selectable text, and a reader
+     can jump straight to "Triggers" instead of paging past the diagram and
+     schema first. Bilingual content that is built once per render — entity
+     descriptions, sample questions, query and trigger captions — uses the
+     same lang="en"/lang="pl" sibling-span pattern as the static markup, so
+     it tracks a language switch without any re-render logic of its own; only
+     the reusable chrome (tab labels, section headings) goes through t(). */
+
+  const bi = (tag, cls, en, pl) => {
+    const node = el(tag, cls);
+    const a = el("span", null, en); a.lang = "en";
+    const b = el("span", null, pl); b.lang = "pl";
+    node.append(a, b);
+    return node;
+  };
+
+  const DB_DIAGRAM_SRC = "assets/model-agency-erd.webp";
+
+  const DB_OVERVIEW = {
+    en: "The schema behind the Model Agency Database System: eleven tables covering agents, models, clients, campaigns, castings, contracts, payments, photo sessions, and portfolio photos.",
+    pl: "Schemat systemu bazodanowego agencji modelek: jedenaście tabel obejmujących agentów, modele, klientów, kampanie, castingi, umowy, płatności, sesje zdjęciowe i zdjęcia portfolio."
+  };
+
+  const DB_ENTITIES = [
+    { name: "Agent", en: "Stores agent records. One agent can manage many models.", pl: "Przechowuje dane agentów. Jeden agent może prowadzić wielu modeli." },
+    { name: "Model_Category", en: "Stores model categories. One category can cover many models.", pl: "Przechowuje kategorie modeli. Jedna kategoria może obejmować wielu modeli." },
+    { name: "Model", en: "Stores model records. Each model is assigned to one agent and one category, and can take part in many castings, hold many contracts, and have many portfolio photos.", pl: "Przechowuje dane modeli. Każdy model jest przypisany do jednego agenta i jednej kategorii. Model może brać udział w wielu castingach, mieć wiele kontraktów oraz wiele zdjęć portfolio." },
+    { name: "Client", en: "Stores agency client records. One client can commission many campaigns.", pl: "Przechowuje dane klientów agencji. Jeden klient może zlecić wiele kampanii." },
+    { name: "Campaign", en: "Stores campaign records. Each campaign belongs to one client and can have many castings, photo sessions, and contracts.", pl: "Przechowuje dane kampanii. Każda kampania należy do jednego klienta. Kampania może mieć wiele castingów, sesji zdjęciowych i kontraktów." },
+    { name: "Casting", en: "Stores casting records. Each casting is assigned to one campaign.", pl: "Przechowuje dane castingów. Każdy casting jest przypisany do jednej kampanii." },
+    { name: "Model_Casting", en: "Associative entity between Model and Casting, recording which models took part in which castings.", pl: "Encja asocjacyjna między Model i Casting. Umożliwia zapisanie udziału wielu modeli w wielu castingach." },
+    { name: "Contract", en: "Stores contracts between a model and a campaign. One model can hold many contracts, and one campaign can have many contracts.", pl: "Przechowuje kontrakty między modelem a kampanią. Jeden model może mieć wiele kontraktów, a jedna kampania może mieć wiele kontraktów." },
+    { name: "Payment", en: "Stores payments assigned to contracts. One contract can have many payments.", pl: "Przechowuje płatności przypisane do kontraktów. Jeden kontrakt może mieć wiele płatności." },
+    { name: "Photo_Session", en: "Stores photo sessions assigned to campaigns. One campaign can have many photo sessions.", pl: "Przechowuje sesje zdjęciowe przypisane do kampanii. Jedna kampania może mieć wiele sesji zdjęciowych." },
+    { name: "Portfolio_Photo", en: "Stores model portfolio photos. One model can have many portfolio photos.", pl: "Przechowuje zdjęcia portfolio modeli. Jeden model może mieć wiele zdjęć portfolio." }
+  ];
+
+  const DB_QUESTIONS = [
+    { en: "Which models took part in the casting for the “Zara Summer 2026” campaign?", pl: "Którzy modele brali udział w castingu do kampanii „Zara Summer 2026”?" },
+    { en: "Which agent manages at least 2 models?", pl: "Który agent prowadzi co najmniej 2 modeli?" },
+    { en: "Which campaigns were commissioned by the client “Zara”?", pl: "Jakie kampanie zostały zlecone przez klienta „Zara”?" },
+    { en: "What is the total payment amount made for contract ID 1?", pl: "Jaka jest łączna kwota płatności wykonanych dla kontraktu o ID 1?" },
+    { en: "Which models have not taken part in any casting?", pl: "Którzy modele nie brali udziału w żadnym castingu?" }
+  ];
+
+  const DB_SCRIPT_DDL = `CREATE TABLE Agent (
+    ID integer PRIMARY KEY,
+    FirstName varchar2(30) NOT NULL,
+    LastName varchar2(30) NOT NULL,
+    Email varchar2(50) UNIQUE,
+    Phone varchar2(20)
+);
+
+CREATE TABLE Model_Category (
+    ID integer PRIMARY KEY,
+    Name varchar2(30) NOT NULL,
+    Description varchar2(150)
+);
+
+CREATE TABLE Model (
+    ID integer PRIMARY KEY,
+    FirstName varchar2(30) NOT NULL,
+    LastName varchar2(30) NOT NULL,
+    DateOfBirth date NOT NULL,
+    HeightCm integer,
+    Gender varchar2(20),
+    Agent_ID integer NOT NULL,
+    Category_ID integer NOT NULL,
+    CONSTRAINT CHK_Model_Height CHECK (HeightCm IS NULL OR HeightCm > 0),
+    CONSTRAINT FK_Model_Agent FOREIGN KEY (Agent_ID) REFERENCES Agent(ID),
+    CONSTRAINT FK_Model_Category FOREIGN KEY (Category_ID) REFERENCES Model_Category(ID)
+);
+
+CREATE TABLE Client (
+    ID integer PRIMARY KEY,
+    Name varchar2(50) NOT NULL,
+    Industry varchar2(40),
+    City varchar2(30)
+);
+
+CREATE TABLE Campaign (
+    ID integer PRIMARY KEY,
+    Name varchar2(50) NOT NULL,
+    Description varchar2(150),
+    DateStart date NOT NULL,
+    DateEnd date,
+    Budget number(10,2),
+    Client_ID integer NOT NULL,
+    CONSTRAINT CHK_Campaign_Dates CHECK (DateEnd IS NULL OR DateEnd >= DateStart),
+    CONSTRAINT CHK_Campaign_Budget CHECK (Budget IS NULL OR Budget >= 0),
+    CONSTRAINT FK_Campaign_Client FOREIGN KEY (Client_ID) REFERENCES Client(ID)
+);
+
+CREATE TABLE Casting (
+    ID integer PRIMARY KEY,
+    Campaign_ID integer NOT NULL,
+    CastingDate date NOT NULL,
+    City varchar2(30),
+    Status varchar2(30),
+    ParticipantCount integer DEFAULT 0 NOT NULL,
+    CONSTRAINT CHK_Casting_ParticipantCount CHECK (ParticipantCount >= 0),
+    CONSTRAINT FK_Casting_Campaign FOREIGN KEY (Campaign_ID) REFERENCES Campaign(ID)
+);
+
+CREATE TABLE Model_Casting (
+    Model_ID integer NOT NULL,
+    Casting_ID integer NOT NULL,
+    Result varchar2(30),
+    Score integer,
+    CONSTRAINT PK_Model_Casting PRIMARY KEY (Model_ID, Casting_ID),
+    CONSTRAINT CHK_ModelCasting_Score CHECK (Score IS NULL OR Score BETWEEN 0 AND 100),
+    CONSTRAINT FK_ModelCasting_Model FOREIGN KEY (Model_ID) REFERENCES Model(ID),
+    CONSTRAINT FK_ModelCasting_Casting FOREIGN KEY (Casting_ID) REFERENCES Casting(ID)
+);
+
+CREATE TABLE Contract (
+    ID integer PRIMARY KEY,
+    Model_ID integer NOT NULL,
+    Campaign_ID integer NOT NULL,
+    ContractDate date NOT NULL,
+    DateStart date NOT NULL,
+    DateEnd date,
+    Rate number(10,2) NOT NULL,
+    Status varchar2(30),
+    CONSTRAINT CHK_Contract_Rate CHECK (Rate > 0),
+    CONSTRAINT CHK_Contract_Dates CHECK (DateEnd IS NULL OR DateEnd >= DateStart),
+    CONSTRAINT UQ_Contract_Model_Campaign UNIQUE (Model_ID, Campaign_ID),
+    CONSTRAINT FK_Contract_Model FOREIGN KEY (Model_ID) REFERENCES Model(ID),
+    CONSTRAINT FK_Contract_Campaign FOREIGN KEY (Campaign_ID) REFERENCES Campaign(ID)
+);
+
+CREATE TABLE Payment (
+    ID integer PRIMARY KEY,
+    Contract_ID integer NOT NULL,
+    Amount number(10,2) NOT NULL,
+    PaymentDate date,
+    Status varchar2(30),
+    CONSTRAINT CHK_Payment_Amount CHECK (Amount > 0),
+    CONSTRAINT FK_Payment_Contract FOREIGN KEY (Contract_ID) REFERENCES Contract(ID)
+);
+
+CREATE TABLE Photo_Session (
+    ID integer PRIMARY KEY,
+    Campaign_ID integer NOT NULL,
+    SessionDate date NOT NULL,
+    Location varchar2(50),
+    Cost number(10,2),
+    CONSTRAINT CHK_PhotoSession_Cost CHECK (Cost IS NULL OR Cost >= 0),
+    CONSTRAINT FK_PhotoSession_Campaign FOREIGN KEY (Campaign_ID) REFERENCES Campaign(ID)
+);
+
+CREATE TABLE Portfolio_Photo (
+    ID integer PRIMARY KEY,
+    Model_ID integer NOT NULL,
+    PhotoURL varchar2(200),
+    PhotoType varchar2(40),
+    DateAdded date,
+    CONSTRAINT FK_PortfolioPhoto_Model FOREIGN KEY (Model_ID) REFERENCES Model(ID)
+);`;
+
+  const DB_SCRIPT_DML = `INSERT INTO Agent (ID, FirstName, LastName, Email, Phone)
+VALUES (1, 'Anna', 'Kowalska', 'anna.kowalska@agency.com', '500100100');
+
+INSERT INTO Agent (ID, FirstName, LastName, Email, Phone)
+VALUES (2, 'Marek', 'Nowak', 'marek.nowak@agency.com', '500200200');
+
+INSERT INTO Agent (ID, FirstName, LastName, Email, Phone)
+VALUES (3, 'Julia', 'Wisniewska', 'julia.wisniewska@agency.com', '500300300');
+
+INSERT INTO Model_Category (ID, Name, Description)
+VALUES (1, 'Fashion', 'Modele do kampanii modowych');
+
+INSERT INTO Model_Category (ID, Name, Description)
+VALUES (2, 'Commercial', 'Modele do reklam komercyjnych');
+
+INSERT INTO Model_Category (ID, Name, Description)
+VALUES (3, 'Fitness', 'Modele sportowi i fitness');
+
+INSERT INTO Model (ID, FirstName, LastName, DateOfBirth, HeightCm, Gender, Agent_ID, Category_ID)
+VALUES (1, 'Maja', 'Lewandowska', DATE '2001-05-14', 178, 'Female', 1, 1);
+
+INSERT INTO Model (ID, FirstName, LastName, DateOfBirth, HeightCm, Gender, Agent_ID, Category_ID)
+VALUES (2, 'Adam', 'Zielinski', DATE '1999-09-22', 185, 'Male', 2, 2);
+
+INSERT INTO Model (ID, FirstName, LastName, DateOfBirth, HeightCm, Gender, Agent_ID, Category_ID)
+VALUES (3, 'Klara', 'Wojcik', DATE '2002-02-10', 172, 'Female', 1, 3);
+
+INSERT INTO Model (ID, FirstName, LastName, DateOfBirth, HeightCm, Gender, Agent_ID, Category_ID)
+VALUES (4, 'Oskar', 'Kaminski', DATE '1998-11-03', 188, 'Male', 3, 1);
+
+INSERT INTO Model (ID, FirstName, LastName, DateOfBirth, HeightCm, Gender, Agent_ID, Category_ID)
+VALUES (5, 'Natalia', 'Mazur', DATE '2003-07-18', 174, 'Female', 1, 2);
+
+INSERT INTO Client (ID, Name, Industry, City)
+VALUES (1, 'Zara', 'Fashion', 'Warsaw');
+
+INSERT INTO Client (ID, Name, Industry, City)
+VALUES (2, 'Nike', 'Sportswear', 'Krakow');
+
+INSERT INTO Client (ID, Name, Industry, City)
+VALUES (3, 'Reserved', 'Fashion', 'Gdansk');
+
+INSERT INTO Campaign (ID, Name, Description, DateStart, DateEnd, Budget, Client_ID)
+VALUES (1, 'Zara Summer 2026', 'Letnia kampania modowa', DATE '2026-06-01', DATE '2026-08-31', 50000, 1);
+
+INSERT INTO Campaign (ID, Name, Description, DateStart, DateEnd, Budget, Client_ID)
+VALUES (2, 'Nike Fitness Launch', 'Kampania nowej kolekcji sportowej', DATE '2026-04-01', DATE '2026-06-30', 75000, 2);
+
+INSERT INTO Campaign (ID, Name, Description, DateStart, DateEnd, Budget, Client_ID)
+VALUES (3, 'Reserved Autumn Lookbook', 'Jesienny lookbook marki Reserved', DATE '2026-09-01', DATE '2026-10-31', 40000, 3);
+
+INSERT INTO Casting (ID, Campaign_ID, CastingDate, City, Status, ParticipantCount)
+VALUES (1, 1, DATE '2026-05-10', 'Warsaw', 'OPEN', 2);
+
+INSERT INTO Casting (ID, Campaign_ID, CastingDate, City, Status, ParticipantCount)
+VALUES (2, 2, DATE '2026-03-15', 'Krakow', 'CLOSED', 2);
+
+INSERT INTO Casting (ID, Campaign_ID, CastingDate, City, Status, ParticipantCount)
+VALUES (3, 3, DATE '2026-08-20', 'Gdansk', 'OPEN', 2);
+
+INSERT INTO Model_Casting (Model_ID, Casting_ID, Result, Score)
+VALUES (1, 1, 'ACCEPTED', 92);
+
+INSERT INTO Model_Casting (Model_ID, Casting_ID, Result, Score)
+VALUES (2, 1, 'REJECTED', 70);
+
+INSERT INTO Model_Casting (Model_ID, Casting_ID, Result, Score)
+VALUES (2, 2, 'ACCEPTED', 88);
+
+INSERT INTO Model_Casting (Model_ID, Casting_ID, Result, Score)
+VALUES (3, 2, 'ACCEPTED', 90);
+
+INSERT INTO Model_Casting (Model_ID, Casting_ID, Result, Score)
+VALUES (3, 3, 'WAITLISTED', 78);
+
+INSERT INTO Model_Casting (Model_ID, Casting_ID, Result, Score)
+VALUES (4, 3, 'ACCEPTED', 85);
+
+INSERT INTO Contract (ID, Model_ID, Campaign_ID, ContractDate, DateStart, DateEnd, Rate, Status)
+VALUES (1, 1, 1, DATE '2026-05-20', DATE '2026-06-01', DATE '2026-08-31', 12000, 'ACTIVE');
+
+INSERT INTO Contract (ID, Model_ID, Campaign_ID, ContractDate, DateStart, DateEnd, Rate, Status)
+VALUES (2, 2, 2, DATE '2026-03-25', DATE '2026-04-01', DATE '2026-06-30', 15000, 'ACTIVE');
+
+INSERT INTO Contract (ID, Model_ID, Campaign_ID, ContractDate, DateStart, DateEnd, Rate, Status)
+VALUES (3, 3, 2, DATE '2026-03-27', DATE '2026-04-01', DATE '2026-06-30', 10000, 'PAID');
+
+INSERT INTO Contract (ID, Model_ID, Campaign_ID, ContractDate, DateStart, DateEnd, Rate, Status)
+VALUES (4, 4, 3, DATE '2026-08-25', DATE '2026-09-01', DATE '2026-10-31', 9000, 'ACTIVE');
+
+INSERT INTO Payment (ID, Contract_ID, Amount, PaymentDate, Status)
+VALUES (1, 1, 6000, DATE '2026-06-15', 'PARTIAL');
+
+INSERT INTO Payment (ID, Contract_ID, Amount, PaymentDate, Status)
+VALUES (2, 1, 6000, DATE '2026-08-15', 'PAID');
+
+INSERT INTO Payment (ID, Contract_ID, Amount, PaymentDate, Status)
+VALUES (3, 2, 7500, DATE '2026-04-15', 'PARTIAL');
+
+INSERT INTO Payment (ID, Contract_ID, Amount, PaymentDate, Status)
+VALUES (4, 3, 10000, DATE '2026-05-01', 'PAID');
+
+INSERT INTO Payment (ID, Contract_ID, Amount, PaymentDate, Status)
+VALUES (5, 4, 3000, DATE '2026-09-10', 'PARTIAL');
+
+INSERT INTO Photo_Session (ID, Campaign_ID, SessionDate, Location, Cost)
+VALUES (1, 1, DATE '2026-06-12', 'Warsaw Studio', 8000);
+
+INSERT INTO Photo_Session (ID, Campaign_ID, SessionDate, Location, Cost)
+VALUES (2, 2, DATE '2026-04-20', 'Krakow Gym Studio', 12000);
+
+INSERT INTO Photo_Session (ID, Campaign_ID, SessionDate, Location, Cost)
+VALUES (3, 3, DATE '2026-09-15', 'Gdansk Old Town', 7000);
+
+INSERT INTO Portfolio_Photo (ID, Model_ID, PhotoURL, PhotoType, DateAdded)
+VALUES (1, 1, 'https://portfolio.com/maja1.jpg', 'Fashion', DATE '2026-01-10');
+
+INSERT INTO Portfolio_Photo (ID, Model_ID, PhotoURL, PhotoType, DateAdded)
+VALUES (2, 2, 'https://portfolio.com/adam1.jpg', 'Commercial', DATE '2026-01-15');
+
+INSERT INTO Portfolio_Photo (ID, Model_ID, PhotoURL, PhotoType, DateAdded)
+VALUES (3, 3, 'https://portfolio.com/klara1.jpg', 'Fitness', DATE '2026-02-01');
+
+INSERT INTO Portfolio_Photo (ID, Model_ID, PhotoURL, PhotoType, DateAdded)
+VALUES (4, 4, 'https://portfolio.com/oskar1.jpg', 'Fashion', DATE '2026-02-12');
+
+INSERT INTO Portfolio_Photo (ID, Model_ID, PhotoURL, PhotoType, DateAdded)
+VALUES (5, 5, 'https://portfolio.com/natalia1.jpg', 'Commercial', DATE '2026-03-05');
+
+COMMIT;`;
+
+  const DB_QUERIES = [
+    {
+      en: "Models in the casting for a specific campaign", pl: "Modele biorące udział w castingu do konkretnej kampanii",
+      sql: `SELECT
+    m.FirstName,
+    m.LastName,
+    c.Name AS CampaignName,
+    mc.Result,
+    mc.Score
+FROM Model m
+JOIN Model_Casting mc ON m.ID = mc.Model_ID
+JOIN Casting ca ON mc.Casting_ID = ca.ID
+JOIN Campaign c ON ca.Campaign_ID = c.ID
+WHERE c.Name = 'Zara Summer 2026';`
+    },
+    {
+      en: "Campaigns commissioned by a specific client", pl: "Kampanie zlecone przez konkretnego klienta",
+      sql: `SELECT
+    c.Name AS ClientName,
+    ca.Name AS CampaignName,
+    ca.Budget,
+    ca.DateStart,
+    ca.DateEnd
+FROM Client c
+JOIN Campaign ca ON c.ID = ca.Client_ID
+WHERE c.Name = 'Zara';`
+    },
+    {
+      en: "Agents managing at least two models", pl: "Agenci prowadzący co najmniej dwóch modeli",
+      sql: `SELECT
+    a.FirstName,
+    a.LastName,
+    COUNT(m.ID) AS ModelCount
+FROM Agent a
+JOIN Model m ON a.ID = m.Agent_ID
+GROUP BY a.ID, a.FirstName, a.LastName
+HAVING COUNT(m.ID) >= 2;`
+    },
+    {
+      en: "Contracts with total payments of at least 10,000", pl: "Kontrakty z łączną kwotą płatności co najmniej 10 000",
+      sql: `SELECT
+    co.ID AS ContractID,
+    SUM(p.Amount) AS TotalPaid
+FROM Contract co
+JOIN Payment p ON co.ID = p.Contract_ID
+GROUP BY co.ID
+HAVING SUM(p.Amount) >= 10000;`
+    },
+    {
+      en: "Models with at least one accepted casting result", pl: "Modele z co najmniej jednym zaakceptowanym wynikiem castingu",
+      sql: `SELECT
+    m.FirstName,
+    m.LastName
+FROM Model m
+WHERE m.ID IN (
+    SELECT mc.Model_ID
+    FROM Model_Casting mc
+    WHERE mc.Result = 'ACCEPTED'
+);`
+    },
+    {
+      en: "Campaigns with an above-average budget", pl: "Kampanie z budżetem powyżej średniej",
+      sql: `SELECT
+    ca.Name,
+    ca.Budget
+FROM Campaign ca
+WHERE ca.Budget > (
+    SELECT AVG(ca2.Budget)
+    FROM Campaign ca2
+);`
+    },
+    {
+      en: "Models who have never taken part in a casting", pl: "Modele, które nigdy nie brały udziału w castingu",
+      sql: `SELECT
+    m.FirstName,
+    m.LastName
+FROM Model m
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM Model_Casting mc
+    WHERE mc.Model_ID = m.ID
+);`
+    }
+  ];
+
+  const DB_TRIGGERS = [
+    {
+      en: "trg_before_payment — defaults a payment's date to today and its status to PARTIAL when left blank, and rejects any amount that isn't positive.",
+      pl: "trg_before_payment — ustawia domyślną datę płatności na dziś i status na PARTIAL, gdy są puste, oraz odrzuca kwoty niedodatnie.",
+      sql: `CREATE OR REPLACE TRIGGER trg_before_payment
+BEFORE INSERT OR UPDATE ON Payment
+FOR EACH ROW
+BEGIN
+    IF :NEW.PaymentDate IS NULL THEN
+        :NEW.PaymentDate := SYSDATE;
+    END IF;
+
+    IF :NEW.Status IS NULL THEN
+        :NEW.Status := 'PARTIAL';
+    END IF;
+
+    IF :NEW.Amount <= 0 THEN
+        RAISE_APPLICATION_ERROR(-20001, 'Payment amount must be greater than zero');
+    END IF;
+END;
+/
+
+INSERT INTO Payment (ID, Contract_ID, Amount, PaymentDate, Status)
+VALUES (6, 4, 6000, NULL, NULL);
+
+SELECT ID, Contract_ID, Amount, PaymentDate, Status
+FROM Payment
+WHERE ID = 6;`
+    },
+    {
+      en: "trg_before_contract — defaults a new contract's status to ACTIVE, rejects an end date earlier than the start date, and blocks deleting a contract that still has payments.",
+      pl: "trg_before_contract — ustawia domyślny status nowego kontraktu na ACTIVE, odrzuca datę zakończenia wcześniejszą niż data rozpoczęcia i blokuje usunięcie kontraktu, który ma płatności.",
+      sql: `CREATE OR REPLACE TRIGGER trg_before_contract
+BEFORE INSERT OR UPDATE OR DELETE ON Contract
+FOR EACH ROW
+DECLARE
+    v_payment_count integer;
+BEGIN
+    IF INSERTING OR UPDATING THEN
+        IF :NEW.Status IS NULL THEN
+            :NEW.Status := 'ACTIVE';
+        END IF;
+
+        IF :NEW.DateEnd IS NOT NULL AND :NEW.DateEnd < :NEW.DateStart THEN
+            RAISE_APPLICATION_ERROR(-20002, 'Contract end date cannot be earlier than start date');
+        END IF;
+    END IF;
+
+    IF DELETING THEN
+        SELECT COUNT(*)
+        INTO v_payment_count
+        FROM Payment
+        WHERE Contract_ID = :OLD.ID;
+
+        IF v_payment_count > 0 THEN
+            RAISE_APPLICATION_ERROR(-20003, 'Cannot delete contract with payments');
+        END IF;
+    END IF;
+END;
+/
+
+INSERT INTO Contract (ID, Model_ID, Campaign_ID, ContractDate, DateStart, DateEnd, Rate, Status)
+VALUES (5, 5, 1, SYSDATE, DATE '2026-07-01', DATE '2026-07-31', 5000, NULL);
+
+SELECT ID, Model_ID, Campaign_ID, Status
+FROM Contract
+WHERE ID = 5;
+
+DELETE FROM Contract
+WHERE ID = 5;
+
+SELECT ID, Model_ID, Campaign_ID, Status
+FROM Contract
+WHERE ID = 5;`
+    },
+    {
+      en: "trg_after_model_casting — keeps a casting's participant count in sync whenever a model is added to, moved between, or removed from castings.",
+      pl: "trg_after_model_casting — utrzymuje liczbę uczestników castingu w zgodności przy dodaniu, przeniesieniu lub usunięciu modelu z castingu.",
+      sql: `CREATE OR REPLACE TRIGGER trg_after_model_casting
+AFTER INSERT OR UPDATE OR DELETE ON Model_Casting
+FOR EACH ROW
+BEGIN
+    IF INSERTING THEN
+        UPDATE Casting
+        SET ParticipantCount = ParticipantCount + 1
+        WHERE ID = :NEW.Casting_ID;
+    END IF;
+
+    IF UPDATING THEN
+        IF :OLD.Casting_ID <> :NEW.Casting_ID THEN
+            UPDATE Casting
+            SET ParticipantCount = ParticipantCount - 1
+            WHERE ID = :OLD.Casting_ID;
+
+            UPDATE Casting
+            SET ParticipantCount = ParticipantCount + 1
+            WHERE ID = :NEW.Casting_ID;
+        END IF;
+    END IF;
+
+    IF DELETING THEN
+        UPDATE Casting
+        SET ParticipantCount = ParticipantCount - 1
+        WHERE ID = :OLD.Casting_ID;
+    END IF;
+END;
+/
+
+SELECT ID, ParticipantCount
+FROM Casting
+WHERE ID IN (1, 2);
+
+INSERT INTO Model_Casting (Model_ID, Casting_ID, Result, Score)
+VALUES (5, 1, 'WAITLISTED', 75);
+
+SELECT ID, ParticipantCount
+FROM Casting
+WHERE ID IN (1, 2);
+
+UPDATE Model_Casting
+SET Casting_ID = 2
+WHERE Model_ID = 5 AND Casting_ID = 1;
+
+SELECT ID, ParticipantCount
+FROM Casting
+WHERE ID IN (1, 2);
+
+DELETE FROM Model_Casting
+WHERE Model_ID = 5 AND Casting_ID = 2;
+
+SELECT ID, ParticipantCount
+FROM Casting
+WHERE ID IN (1, 2);`
+    },
+    {
+      en: "trg_after_payment — keeps a contract's status in sync with its payments: PAID once a payment is marked PAID, ACTIVE again if that payment is removed or reverted.",
+      pl: "trg_after_payment — utrzymuje status kontraktu w zgodności z jego płatnościami: PAID, gdy płatność zostanie oznaczona jako PAID, ponownie ACTIVE po jej usunięciu lub cofnięciu.",
+      sql: `CREATE OR REPLACE TRIGGER trg_after_payment
+AFTER INSERT OR UPDATE OR DELETE ON Payment
+FOR EACH ROW
+BEGIN
+    IF INSERTING OR UPDATING THEN
+        IF :NEW.Status = 'PAID' THEN
+            UPDATE Contract
+            SET Status = 'PAID'
+            WHERE ID = :NEW.Contract_ID;
+        ELSE
+            UPDATE Contract
+            SET Status = 'ACTIVE'
+            WHERE ID = :NEW.Contract_ID;
+        END IF;
+    END IF;
+
+    IF DELETING THEN
+        UPDATE Contract
+        SET Status = 'ACTIVE'
+        WHERE ID = :OLD.Contract_ID;
+    END IF;
+END;
+/
+
+SELECT ID, Status
+FROM Contract
+WHERE ID = 4;
+
+UPDATE Payment
+SET Status = 'PAID'
+WHERE ID = 6;
+
+SELECT ID, Status
+FROM Contract
+WHERE ID = 4;
+
+DELETE FROM Payment
+WHERE ID = 6;
+
+SELECT ID, Status
+FROM Contract
+WHERE ID = 4;
+
+COMMIT;`
+    }
+  ];
+
+  const dbBlock = (en, pl, sql) => {
+    const wrap = el("div", "db-block");
+    wrap.appendChild(bi("h3", "db-block-title", en, pl));
+    const pre = el("pre", "db-code");
+    pre.appendChild(el("code", null, sql));
+    wrap.appendChild(pre);
+    return wrap;
+  };
+
+  const DB_TABS = ["diagram", "schema", "queries", "triggers"];
+  const DB_TAB_LABEL_KEYS = { diagram: "dbTabDiagram", schema: "dbTabSchema", queries: "dbTabQueries", triggers: "dbTabTriggers" };
+
+  const db = makeDialog("db-modal");
+  const dbState = { activeTab: "diagram" };
+  const dbTitle = el("h2", null, "");
+  const dbCloseBtn = el("button", "btn btn--sm", "");
+  dbCloseBtn.type = "button";
+  dbCloseBtn.addEventListener("click", db.close);
+
+  const dbBar = el("div", "modal-bar");
+  dbBar.append(dbTitle, dbCloseBtn);
+
+  const dbTabList = el("div", "db-tabs");
+  dbTabList.setAttribute("role", "tablist");
+  const dbStage = el("div", "db-stage");
+  dbStage.id = "db-panel";
+  dbStage.setAttribute("role", "tabpanel");
+
+  const dbTabButtons = DB_TABS.map((key) => {
+    const btn = el("button", "db-tab", "");
+    btn.type = "button";
+    btn.id = `db-tab-${key}`;
+    btn.dataset.tab = key;
+    btn.setAttribute("role", "tab");
+    btn.setAttribute("aria-controls", "db-panel");
+    dbTabList.appendChild(btn);
+    return btn;
+  });
+
+  const renderDbTab = (key) => {
+    dbStage.dataset.tab = key;
+    dbStage.replaceChildren();
+
+    if (key === "diagram") {
+      const img = el("img");
+      img.src = DB_DIAGRAM_SRC;
+      img.width = 1200; img.height = 750;
+      img.alt = t("modelAgencyDiagramAlt");
+      img.loading = "lazy"; img.decoding = "async";
+      dbStage.appendChild(img);
+      return;
+    }
+
+    const content = el("div", "db-content");
+
+    if (key === "schema") {
+      content.appendChild(bi("p", "db-intro", DB_OVERVIEW.en, DB_OVERVIEW.pl));
+
+      content.appendChild(el("h3", "db-block-title", t("dbEntitiesHeading")));
+      const dl = el("dl", "db-entities");
+      DB_ENTITIES.forEach((ent) => dl.append(el("dt", null, ent.name), bi("dd", null, ent.en, ent.pl)));
+      content.appendChild(dl);
+
+      content.appendChild(el("h3", "db-block-title", t("dbQuestionsHeading")));
+      const ul = el("ul", "db-questions");
+      DB_QUESTIONS.forEach((q) => ul.appendChild(bi("li", null, q.en, q.pl)));
+      content.appendChild(ul);
+
+      content.appendChild(dbBlock("Creation script", "Skrypt tworzący", DB_SCRIPT_DDL));
+      content.appendChild(dbBlock("Sample data", "Przykładowe dane", DB_SCRIPT_DML));
+    }
+
+    if (key === "queries") DB_QUERIES.forEach((q) => content.appendChild(dbBlock(q.en, q.pl, q.sql)));
+    if (key === "triggers") DB_TRIGGERS.forEach((tr) => content.appendChild(dbBlock(tr.en, tr.pl, tr.sql)));
+
+    dbStage.appendChild(content);
+  };
+
+  const setDbTab = (key) => {
+    dbState.activeTab = key;
+    dbTabButtons.forEach((b) => {
+      const active = b.dataset.tab === key;
+      b.setAttribute("aria-selected", String(active));
+      b.tabIndex = active ? 0 : -1;
+    });
+    renderDbTab(key);
+  };
+
+  dbTabButtons.forEach((btn) => btn.addEventListener("click", () => setDbTab(btn.dataset.tab)));
+  dbTabList.addEventListener("keydown", (e) => {
+    const i = dbTabButtons.indexOf(document.activeElement);
+    if (i === -1) return;
+    const moves = { ArrowRight: 1, ArrowLeft: -1 };
+    if (e.key in moves) {
+      e.preventDefault();
+      const next = dbTabButtons[(i + moves[e.key] + dbTabButtons.length) % dbTabButtons.length];
+      next.focus(); setDbTab(next.dataset.tab);
+    } else if (e.key === "Home") {
+      e.preventDefault(); dbTabButtons[0].focus(); setDbTab(dbTabButtons[0].dataset.tab);
+    } else if (e.key === "End") {
+      e.preventDefault();
+      const last = dbTabButtons[dbTabButtons.length - 1];
+      last.focus(); setDbTab(last.dataset.tab);
+    }
+  });
+
+  onLangChange(() => {
+    dbTitle.textContent = t("modelAgency");
+    dbCloseBtn.textContent = t("close");
+    dbTabButtons.forEach((b) => { b.textContent = t(DB_TAB_LABEL_KEYS[b.dataset.tab]); });
+    if (db.dlg.open) renderDbTab(dbState.activeTab);
+  });
+
+  const dbPanel = el("div", "db-panel");
+  dbPanel.append(dbBar, dbTabList, dbStage);
+  db.dlg.appendChild(dbPanel);
+
+  document.addEventListener("click", (e) => {
+    const trigger = e.target.closest("[data-db]");
+    if (!trigger) return;
+    e.preventDefault();
+    setDbTab("diagram");
+    db.open();
   });
 
   /* --- Project rail ------------------------------------------------------- */
